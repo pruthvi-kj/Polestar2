@@ -1,15 +1,16 @@
 Feature: Verify the navigation in Footer
 
-#  @FooterLinksVerify @Footer
-#  Scenario Outline: Verify the navigation to different pages from the Polestar 2 US page
-#    Given User is in "<website>" page
-#    When user navigates to footer
-#    And clicks on "<link>"
-#    Then Verify the user lands on "<page>"
-#
-#    Examples:
-#      |website                  | link | page |
-#      |https://www.polestar.com/us/polestar-2/|Home|Pure progressive performance * Polestar|
+  @FooterLinksVerify @Footer
+  Scenario Outline: Verify the navigation to different pages from the Polestar 2 US page
+    Given User is in "<website>" page
+    When user navigates to footer
+    And clicks on "<link>"
+    Then Verify the user lands on "<page>"
+    And when user clicks on back verify that back user lands on Polestar 2 homepage
+
+    Examples:
+      |website                  | link | page |
+      |https://www.polestar.com/us/polestar-2/|Home|Pure progressive performance * Polestar|
 #      |https://www.polestar.com/us/polestar-2/|Polestar 1|Polestar 1 – The hybrid electric performance car * Polestar US|
 #      |https://www.polestar.com/us/polestar-2/|Polestar 2|Polestar 2 – The 100% electric car * Polestar US|
 #      |https://www.polestar.com/us/polestar-2/|News|Polestar - News|
@@ -34,9 +35,14 @@ Feature: Verify the navigation in Footer
       When user navigates to footer
       And clicks on "Subscribe"
       Then Verify the user lands on "Newsletter sign up"
-      And when
+      And when user clicks on back verify that back user lands on Polestar 2 homepage
 
 
-    @Footer @
-    Scenario:
+    @Footer @FooterChangeLocation
+    Scenario: Verify the Change Location link from Polestar 2 homepage
+      Given User is in "https://www.polestar.com/us/polestar-2/" page
+      When user navigates to footer
+      And clicks on "Change Location"
+      Then Verify the user lands on "Select your region"
+      And when user clicks on close user lands on Polestar 2 homepage
 
