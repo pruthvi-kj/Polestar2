@@ -5,10 +5,14 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
+
+import java.util.Set;
 
 public class Steps {
     WebDriver driver;
+    static String menu;
     Polestar2 p;
     @Given("User is in {string} page")
     public void user_is_in_page(String url) throws InterruptedException {
@@ -56,8 +60,16 @@ public class Steps {
         boolean isVisible;
         isVisible=p.isElementVisible("Select your region");
         Assert.assertEquals(false,isVisible);
+    }
 
+    @When("user navigates to header")
+    public void user_navigates_to_header() {
+        p.clickOnTheLink("Header Menu");
+    }
 
+    @When("user moves the mouse to {string}")
+    public void user_moves_the_mouse_to(String Menu) throws InterruptedException {
+        p.moveCursorTo(Menu);
     }
 
 }

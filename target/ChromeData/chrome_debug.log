@@ -1,0 +1,2 @@
+[2099:775:0121/193446.149086:INFO:CONSOLE(2)] "running v2.22.0 build 10034 (9333309ba000ce26783308fa9b91911335679c91)", source: https://www.polestar.com/web3-static/app-48ac8870403515d593c9.js (2)
+[2099:775:0121/193458.616171:WARNING:pref_notifier_impl.cc(40)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
