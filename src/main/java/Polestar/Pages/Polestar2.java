@@ -19,9 +19,8 @@ public class Polestar2 extends commonMethods {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-//        Thread.sleep(4000);
-//        if(acceptCookies.isDisplayed())
-//        clickOnElement(acceptCookies);
+        Thread.sleep(2000);
+        clickOnElement(acceptCookies);
     }
 
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
@@ -63,16 +62,16 @@ public class Polestar2 extends commonMethods {
     @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
     private WebElement polestar2TestDrive;
 
-    @FindBy(id = "c4dyctxhgnltih8h-0-title")
+    @FindBy(xpath = "//button[@class='css-1pqb5ae'][1]")
     private WebElement polestarDotComFooterMobile;
 
-    @FindBy(id = "c4dyctxhgnltih8h-1-title")
+    @FindBy(xpath = "//button[@class='css-1pqb5ae'][2]")
     private WebElement polestarFooterMobile;
 
-    @FindBy(id = "c4dyctxhgnltih8h-2-title")
+    @FindBy(xpath = "//button[@class='css-1pqb5ae'][3]")
     private WebElement discoverFooterMobile;
 
-    @FindBy(id = "c4dyctxhgnltih8h-3-title")
+    @FindBy(xpath = "//button[@class='css-1pqb5ae'][4]")
     private WebElement socialFooterMobile;
 
 

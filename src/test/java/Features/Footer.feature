@@ -51,7 +51,7 @@ Feature: Verify the navigation in Footer
     And when user clicks on close user lands on Polestar 2 homepage
 
   @Footer @Mobile
-  Scenario Outline: Verify the navigation to different pages from the footer of Polestar 2 US page
+  Scenario Outline: Verify the navigation to different pages from the footer of Polestar 2 US page in Mobile platform
     Given User is in "Polestar2" page
     When user navigates to footer
     And clicks on "<footerLink>"
@@ -61,7 +61,7 @@ Feature: Verify the navigation in Footer
 
     Examples:
       | footerLink   | link               | page                                                           |
-      | polestar.com | Home               | Pure progressive performance * Polestar                        |
+      | polestar.com | Home               | Polestar – Electric cars * Polestar US                         |
       | polestar.com | Polestar 1         | Polestar 1 – The hybrid electric performance car * Polestar US |
       | polestar.com | Polestar 2         | Polestar 2 – The 100% electric car * Polestar US               |
       | polestar.com | News               | Polestar - News                                                |
@@ -80,7 +80,4 @@ Feature: Verify the navigation in Footer
       | Social       | Twitter            | Polestar (@PolestarCars) / Twitter                             |
       | Social       | YouTube            | Polestar - YouTube                                             |
       | Social       | Subscribe          | Newsletter sign up                                             |
-
-
-
 
