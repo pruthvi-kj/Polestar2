@@ -1,25 +1,24 @@
 package Polestar.Pages;
 
 import Polestar.Utils.commonMethods;
-import org.openqa.selenium.*;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class Polestar2 extends commonMethods {
     WebDriver driver;
-    WebDriverWait wait;
-
 
     public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         if(acceptCookies.isDisplayed())
         clickOnElement(acceptCookies);
     }
@@ -54,13 +53,13 @@ public class Polestar2 extends commonMethods {
     @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
     private WebElement polestar1Configure;
 
-    @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
+    @FindBy(xpath = "//a[@href='/us/polestar-2/' and @class='css-1p608u1']")
     private WebElement polestar2Explore;
 
-    @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
+    @FindBy(xpath = "//a[@href='/us/polestar-2/configurator/' and @class='css-1p608u1']")
     private WebElement polestar2Configure;
 
-    @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
+    @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
     private WebElement polestar2TestDrive;
 
     public void navigateToFooter() throws InterruptedException {
@@ -105,7 +104,8 @@ public class Polestar2 extends commonMethods {
                 clickOnElement(polestar1Explore);
                 break;
             case "Polestar 1 Configure":
-                clickOnElement(polestar1Configure);
+                Actions a= new Actions(driver);
+                a.moveToElement(polestar1Configure).click().build().perform();
                 break;
             case "Polestar 2 Configure":
                 clickOnElement(polestar2Configure);
@@ -146,11 +146,8 @@ public class Polestar2 extends commonMethods {
     public void moveCursorTo(String Menu) throws InterruptedException {
         Thread.sleep(1000);
         WebElement menuElement = checkElementExists(headerLinks.iterator(), Menu);
-        System.out.println(menuElement.getText() + "    " + Menu);
-
         Actions action = new Actions(driver);
         try {
-            System.out.println("inside move");
             action.moveToElement(menuElement).build().perform();
         } catch (Exception e) {
             throw e;

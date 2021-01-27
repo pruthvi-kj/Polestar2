@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: Runner.TestRunner
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.241 s <<< FAILURE! - in Runner.TestRunner
-initializationError(Runner.TestRunner)  Time elapsed: 0.005 s  <<< ERROR!
-io.cucumber.core.gherkin.FeatureParserException: 
-Failed to parse resource at: file:///Users/pruthvikj/IdeaProjects/Polestar2/src/test/java/Features/Features.feature
-(41:1): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'Feature: Verify the navigation in Header'
-

@@ -1,7 +1,6 @@
 package Polestar.Utils;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class commonMethods {
 

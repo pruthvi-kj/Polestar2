@@ -7,112 +7,134 @@
   <groupId>com.polestar</groupId>
   <artifactId>Polestar2</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <name>Polestar2</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
+
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven-surefire-plugin>3.0.0-M5</maven-surefire-plugin>
+    <maven-cucumber-reporting>5.4.0</maven-cucumber-reporting>
+    <junit-jupiter-api>5.7.0</junit-jupiter-api>
+    <cucumber-junit-plugins>6.9.0</cucumber-junit-plugins>
+    <reporting-plugin>4.0.94</reporting-plugin>
+    <selenium-plugin>3.141.59</selenium-plugin>
+    <webdrivermanager>4.2.2</webdrivermanager>
   </properties>
 
+  <build>
+    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin}</version>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+          <systemPropertyVariables>
+            <!--suppress UnresolvedMavenProperty -->
+            <browserName>${browserName}</browserName>
+          </systemPropertyVariables>
+
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.masterthought</groupId>
+        <artifactId>maven-cucumber-reporting</artifactId>
+        <version>${maven-cucumber-reporting}</version>
+        <executions>
+          <execution>
+            <id>execution</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <projectName>cucumber-jvm-example</projectName>
+              <!-- optional, per documentation set this to "true" to bypass generation of Cucumber Reports entirely, defaults to false if not specified -->
+              <skip>false</skip>
+              <!-- output directory for the generated report -->
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <!-- optional, defaults to outputDirectory if not specified -->
+              <inputDirectory>${project.build.directory}/jsonReport</inputDirectory>
+              <jsonFiles>
+                <!-- supports wildcard or name pattern -->
+                <param>**/*.json</param>
+              </jsonFiles>
+              <!-- optional, defaults to outputDirectory if not specified -->
+              <!-- optional, set true to group features by its Ids -->
+              <mergeFeaturesById>false</mergeFeaturesById>
+              <!-- optional, set true to get a final report with latest results of the same test from different test runs -->
+              <mergeFeaturesWithRetest>false</mergeFeaturesWithRetest>
+              <!-- optional, set true to fail build on test failures -->
+              <checkBuildResult>false</checkBuildResult>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>7</source>
+          <target>7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit-jupiter-api}</version>
       <scope>test</scope>
     </dependency>
-      <dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-java</artifactId>
+      <version>${cucumber-junit-plugins}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit</artifactId>
+      <version>${cucumber-junit-plugins}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <version>${cucumber-junit-plugins}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.monochromata.cucumber</groupId>
+      <artifactId>reporting-plugin</artifactId>
+      <version>${reporting-plugin}</version>
+    </dependency>
+    <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>3.141.59</version>
+        <version>${selenium-plugin}</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-server</artifactId>
-        <version>3.141.59</version>
+        <version>${selenium-plugin}</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-chrome-driver</artifactId>
-        <version>3.141.59</version>
+        <version>${selenium-plugin}</version>
       </dependency>
-      <dependency>
+    <dependency>
         <groupId>io.github.bonigarcia</groupId>
         <artifactId>webdrivermanager</artifactId>
-        <version>4.2.2</version>
+        <version>${webdrivermanager}</version>
       </dependency>
-      <dependency>
-        <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-java</artifactId>
-        <version>6.9.0</version>
-      </dependency>
-    <dependency>
-      <groupId>de.monochromata.cucumber</groupId>
-      <artifactId>reporting-plugin</artifactId>
-      <version>4.0.94</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>htmlunit-driver</artifactId>
-      <version>2.26</version>
-    </dependency>
-    <dependency>
-        <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-junit</artifactId>
-        <version>6.9.0</version>
-        <scope>test</scope>
-      </dependency>
-  </dependencies>
+ </dependencies>
 
-  <build>
-    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
-      <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.22.1</version>
-            <configuration>
-              <testFailureIgnore>true</testFailureIgnore>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>net.masterthought</groupId>
-            <artifactId>maven-cucumber-reporting</artifactId>
-            <version>5.4.0</version>
-            <executions>
-              <execution>
-                <id>execution</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>generate</goal>
-                </goals>
-                <configuration>
-                  <projectName>cucumber-jvm-example</projectName>
-                  <!-- optional, per documentation set this to "true" to bypass generation of Cucumber Reports entirely, defaults to false if not specified -->
-                  <skip>false</skip>
-                  <!-- output directory for the generated report -->
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <!-- optional, defaults to outputDirectory if not specified -->
-                  <inputDirectory>${project.build.directory}/jsonReport</inputDirectory>
-                  <jsonFiles>
-                    <!-- supports wildcard or name pattern -->
-                    <param>**/*.json</param>
-                  </jsonFiles>
-                  <!-- optional, defaults to outputDirectory if not specified -->
-                  <!-- optional, set true to group features by its Ids -->
-                  <mergeFeaturesById>false</mergeFeaturesById>
-                  <!-- optional, set true to get a final report with latest results of the same test from different test runs -->
-                  <mergeFeaturesWithRetest>false</mergeFeaturesWithRetest>
-                  <!-- optional, set true to fail build on test failures -->
-                  <checkBuildResult>false</checkBuildResult>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-  </build>
 </project>
