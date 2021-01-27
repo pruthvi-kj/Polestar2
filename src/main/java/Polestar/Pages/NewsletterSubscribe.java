@@ -11,9 +11,9 @@ public class NewsletterSubscribe {
 
     WebDriver driver;
     Iterator<WebElement> w;
-    public NewsletterSubscribe(WebDriver driver)
-    {
-        this.driver=driver;
+
+    public NewsletterSubscribe(WebDriver driver) {
+        this.driver = driver;
         PageFactory.initElements(driver, this);
     }
 
@@ -37,7 +37,6 @@ public class NewsletterSubscribe {
 
     @FindBy(xpath = "//span[text()='Back']")
     private WebElement BackCTA;
-
 
 
 }

@@ -8,7 +8,6 @@ public class commonMethods {
         try {
             element.click();
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
 
         }

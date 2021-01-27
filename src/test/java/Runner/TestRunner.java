@@ -6,11 +6,12 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        features ="src/test/java/Features" ,
-        glue ="Steps",
+        features = "src/test/java/Features",
+        glue = "Steps",
         plugin = {"pretty", "html:target/Destination", "de.monochromata.cucumber.report.PrettyReports:target/cucumber",
-                "json:target/jsonReport/cucumber.json"}
-        )
+                "json:target/jsonReport/cucumber.json"},
+        tags = "@Android"
+)
 public class TestRunner {
 
 }

@@ -8,6 +8,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,9 +19,9 @@ public class Polestar2 extends commonMethods {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-        Thread.sleep(2000);
-        if(acceptCookies.isDisplayed())
-        clickOnElement(acceptCookies);
+//        Thread.sleep(4000);
+//        if(acceptCookies.isDisplayed())
+//        clickOnElement(acceptCookies);
     }
 
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
@@ -62,6 +63,19 @@ public class Polestar2 extends commonMethods {
     @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
     private WebElement polestar2TestDrive;
 
+    @FindBy(id = "c4dyctxhgnltih8h-0-title")
+    private WebElement polestarDotComFooterMobile;
+
+    @FindBy(id = "c4dyctxhgnltih8h-1-title")
+    private WebElement polestarFooterMobile;
+
+    @FindBy(id = "c4dyctxhgnltih8h-2-title")
+    private WebElement discoverFooterMobile;
+
+    @FindBy(id = "c4dyctxhgnltih8h-3-title")
+    private WebElement socialFooterMobile;
+
+
     public void navigateToFooter() throws InterruptedException {
         ((JavascriptExecutor) driver)
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
@@ -84,8 +98,12 @@ public class Polestar2 extends commonMethods {
         return isDisplayed;
     }
 
-    public void clickOnTheLink(String linktext) {
-        switch (linktext) {
+    public void clickOnTheLink(String linkText) {
+        List<String> a = new ArrayList<String>();
+        a.add("addsfg");
+        a.add("sdfsdfg");
+        a.add("dfdsfd");
+        switch (linkText) {
             case "Subscribe":
                 clickOnElement(SubscribeBtn);
                 break;
@@ -104,8 +122,8 @@ public class Polestar2 extends commonMethods {
                 clickOnElement(polestar1Explore);
                 break;
             case "Polestar 1 Configure":
-                Actions a= new Actions(driver);
-                a.moveToElement(polestar1Configure).click().build().perform();
+                Actions ac = new Actions(driver);
+                ac.moveToElement(polestar1Configure).click().build().perform();
                 break;
             case "Polestar 2 Configure":
                 clickOnElement(polestar2Configure);
@@ -116,12 +134,25 @@ public class Polestar2 extends commonMethods {
             case "Polestar 2 Test Drive":
                 clickOnElement(polestar2TestDrive);
                 break;
+            case "polestar.com":
+                clickOnElement(polestarDotComFooterMobile);
+                break;
+            case "Polestar":
+                clickOnElement(polestarFooterMobile);
+                break;
+            case "Discover":
+                clickOnElement(discoverFooterMobile);
+                break;
+            case "Social":
+                clickOnElement(socialFooterMobile);
+                break;
             default:
                 Iterator<WebElement> h = headerLinks.iterator();
+                //to check if there are header elements are present
                 if (!h.hasNext()) {
-                    clickOnElement(checkElementExists(footerLinks.iterator(), linktext));
+                    clickOnElement(checkElementExists(footerLinks.iterator(), linkText));
                 } else if (h.hasNext()) {
-                    clickOnElement(checkElementExists(h, linktext));
+                    clickOnElement(checkElementExists(h, linkText));
                 }
         }
     }
