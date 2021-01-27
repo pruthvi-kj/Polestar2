@@ -21,15 +21,16 @@ import java.util.concurrent.TimeUnit;
 
 public class hooks extends Utils {
     private static WebDriver driver;
-    private static String browserName;
 
     @Before("@Mobile")
     public static void openMobileBrowser() throws IOException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
-        browserName = (System.getProperty("browserName") == null) ? "Android" : System.getProperty("browserName");
-        switch (browserName) {
-            case "Android":
+        String platform;
+        platform = (System.getProperty("mobilePlatform") == null) ? "Android" : System.getProperty("mobilePlatform");
+
+        switch (platform) {
+            case "android":
                 capabilities.setCapability("browserName", "chrome");
                 // For deviceName, platformVersion Kobiton supports wildcard
                 // character *, with 3 formats: *text, text* and *text*
@@ -62,9 +63,9 @@ public class hooks extends Utils {
     }
     @Before("@Desktop")
     public void openWebBrowser(){
-        browserName = (System.getProperty("browserName") == null) ? "Chrome" : System.getProperty("browserName");
-        System.out.println(browserName);
-        switch (browserName) {
+        String platform;
+        platform = (System.getProperty("desktopPlatform") == null) ? "chrome" : System.getProperty("desktopPlatform");
+        switch (platform) {
             case "Chrome":
                 WebDriverManager.chromedriver().setup();
                 ChromeOptions options = new ChromeOptions();
@@ -73,7 +74,7 @@ public class hooks extends Utils {
                 options.addArguments("user-data-dir=target/ChromeData");
                 driver = new ChromeDriver(options);
                 break;
-            case "Firefox":
+            case "firefox":
                 WebDriverManager.firefoxdriver().setup();
                 driver = new FirefoxDriver();
                 break;

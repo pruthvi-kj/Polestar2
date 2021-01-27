@@ -2,8 +2,10 @@
 
 Running tests
 
-mvn test verify -Dcucumber.filter.tags='@Desktop' -DbrowserName='Firefox'
+mvn test verify -Dcucumber.filter.tags='@Desktop' -DdesktopPlatform='chrome' -DmobilePlatform='android'
 
 tags allowed are @Desktop, @Footer, @Mobile, @Header
 
-browserName allowed are firefox, chrome, android, ios
+desktopPlatform allowed are firefox, chrome
+
+mobilePlatform allowed are android, ios

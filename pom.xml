@@ -36,7 +36,9 @@
                     <testFailureIgnore>true</testFailureIgnore>
                     <systemPropertyVariables>
                         <!--suppress UnresolvedMavenProperty -->
-                        <browserName>${browserName}</browserName>
+                        <desktopPlatform>${desktopPlatform}</desktopPlatform>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <mobilePlatform>${mobilePlatform}</mobilePlatform>
                     </systemPropertyVariables>
 
                 </configuration>
