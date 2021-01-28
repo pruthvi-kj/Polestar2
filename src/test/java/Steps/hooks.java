@@ -10,7 +10,9 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import resources.Utils;
@@ -61,22 +63,27 @@ public class hooks extends Utils {
             capabilities.setCapability("deviceGroup", "KOBITON");
             driver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
     }
+
     @Before("@Desktop")
     public void openWebBrowser(){
         String platform;
-        platform = (System.getProperty("desktopPlatform") == null) ? "chrome" : System.getProperty("desktopPlatform");
+        platform = (System.getProperty("desktopPlatform") == null) ? "firefox" : System.getProperty("desktopPlatform");
         switch (platform) {
             case "Chrome":
                 WebDriverManager.chromedriver().setup();
                 ChromeOptions options = new ChromeOptions();
-//                  options.addArguments("--headless");
-//                  options.addArguments("window-size=1920,1080");
+                options.addArguments("--headless");
+                options.addArguments("window-size=1920,1080");
                 options.addArguments("user-data-dir=target/ChromeData");
                 driver = new ChromeDriver(options);
                 break;
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver();
+                FirefoxBinary firefoxBinary = new FirefoxBinary();
+                firefoxBinary.addCommandLineOptions("--headless");
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                firefoxOptions.setBinary(firefoxBinary);
+                driver = new FirefoxDriver(firefoxOptions);
                 break;
         }
         driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
