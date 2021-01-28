@@ -29,7 +29,7 @@ public class hooks extends Utils {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
         String platform;
-        platform = (System.getProperty("mobilePlatform") == null) ? "Android" : System.getProperty("mobilePlatform");
+        platform = (System.getProperty("mobilePlatform") == null) ? "android" : System.getProperty("mobilePlatform");
 
         switch (platform) {
             case "android":
@@ -102,7 +102,7 @@ public class hooks extends Utils {
             // embed it in the report.
             scenario.attach(screenshot, "image/png", "failure");
         }
-        driver.quit();
+        driver.close();
     }
 
     @AfterStep
