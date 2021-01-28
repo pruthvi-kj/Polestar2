@@ -29,8 +29,8 @@ public class hooks extends Utils {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
         String platform;
-        platform = (System.getProperty("mobilePlatform") == null) ? "android" : System.getProperty("mobilePlatform");
-
+        platform = (System.getProperty("mobilePlatform") == null) ? "ios" : System.getProperty("mobilePlatform");
+        System.out.println(platform);
         switch (platform) {
             case "android":
                 capabilities.setCapability("browserName", "chrome");
@@ -68,6 +68,7 @@ public class hooks extends Utils {
     public void openWebBrowser(){
         String platform;
         platform = (System.getProperty("desktopPlatform") == null) ? "firefox" : System.getProperty("desktopPlatform");
+        System.out.println(System.getProperty("desktopPlatform"));
         switch (platform) {
             case "Chrome":
                 WebDriverManager.chromedriver().setup();
