@@ -31,7 +31,7 @@ public class hooks extends Utils {
             DesiredCapabilities capabilities = new DesiredCapabilities();
             String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
             String platform;
-            platform = (System.getProperty("mobilePlatform") == null) ? "andorid" : System.getProperty("mobilePlatform");
+            platform = (System.getProperty("mobilePlatform") == null) ? "android" : System.getProperty("mobilePlatform");
             System.out.println(platform);
             switch (platform) {
                 case "android":

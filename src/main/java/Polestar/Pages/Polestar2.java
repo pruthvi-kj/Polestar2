@@ -7,8 +7,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,13 +19,16 @@ public class Polestar2 extends commonMethods {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         try {
-            if (acceptCookies.isDisplayed()) {
-                WebDriverWait wait = new WebDriverWait(driver, 3);
-                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
-                clickOnElement(acceptCookies);}
-            }catch(Exception e){}
+//                WebDriverWait wait = new WebDriverWait(driver, 3);
+//                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
+//                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath
+//                        ("//button[@class='optanon-allow-all accept-cookies-button']")));
+            clickOnElement(acceptCookies);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
