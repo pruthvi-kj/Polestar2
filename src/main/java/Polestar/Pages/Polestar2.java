@@ -22,9 +22,12 @@ public class Polestar2 extends commonMethods {
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         Thread.sleep(2000);
-//        WebDriverWait wait= new WebDriverWait(driver,3);
-//        wait.until(ExpectedConditions.elementToBeClickable(acceptCookies)).click();
-        clickOnElement(acceptCookies);
+        try {
+            if (acceptCookies.isDisplayed()) {
+                WebDriverWait wait = new WebDriverWait(driver, 3);
+                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
+                clickOnElement(acceptCookies);}
+            }catch(Exception e){}
     }
 
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")

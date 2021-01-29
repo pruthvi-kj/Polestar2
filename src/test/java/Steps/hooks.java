@@ -15,6 +15,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
 import resources.Utils;
 
 import java.io.IOException;
@@ -22,36 +23,37 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class hooks extends Utils {
-    private static WebDriver driver;
+    private static WebDriver driver, desktopDriver, mobileDriver;
 
     @Before("@Mobile")
     public static void openMobileBrowser() throws IOException {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
-        String platform;
-        platform = (System.getProperty("mobilePlatform") == null) ? "ios" : System.getProperty("mobilePlatform");
-        System.out.println(platform);
-        switch (platform) {
-            case "android":
-                capabilities.setCapability("browserName", "chrome");
-                // For deviceName, platformVersion Kobiton supports wildcard
-                // character *, with 3 formats: *text, text* and *text*
-                // If there is no *, Kobiton will match the exact text provided
-                capabilities.setCapability("deviceName", getDeviceProperty("deviceNameAndroid"));
-                capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionAndroid"));
-                capabilities.setCapability("platformName", "Android");
-                break;
+        if (mobileDriver == null) {
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
+            String platform;
+            platform = (System.getProperty("mobilePlatform") == null) ? "andorid" : System.getProperty("mobilePlatform");
+            System.out.println(platform);
+            switch (platform) {
+                case "android":
+                    capabilities.setCapability("browserName", "chrome");
+                    // For deviceName, platformVersion Kobiton supports wildcard
+                    // character *, with 3 formats: *text, text* and *text*
+                    // If there is no *, Kobiton will match the exact text provided
+                    capabilities.setCapability("deviceName", getDeviceProperty("deviceNameAndroid"));
+                    capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionAndroid"));
+                    capabilities.setCapability("platformName", "Android");
+                    break;
 
-            case "ios":
-                capabilities.setCapability("browserName", "safari");
-                // For deviceName, platformVersion Kobiton supports wildcard
-                // character *, with 3 formats: *text, text* and *text*
-                // If there is no *, Kobiton will match the exact text provided
-                capabilities.setCapability("deviceName", getDeviceProperty("deviceNameIos"));
-                capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionIos"));
-                capabilities.setCapability("platformName", "iOS");
-                break;
-        }
+                case "ios":
+                    capabilities.setCapability("browserName", "safari");
+                    // For deviceName, platformVersion Kobiton supports wildcard
+                    // character *, with 3 formats: *text, text* and *text*
+                    // If there is no *, Kobiton will match the exact text provided
+                    capabilities.setCapability("deviceName", getDeviceProperty("deviceNameIos"));
+                    capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionIos"));
+                    capabilities.setCapability("platformName", "iOS");
+                    break;
+            }
 
             capabilities.setCapability("sessionName", "Automation test session");
             capabilities.setCapability("sessionDescription", "");
@@ -61,34 +63,52 @@ public class hooks extends Utils {
             // within the group.
             capabilities.setCapability("groupId", 2016); // Group: Team-Polestar
             capabilities.setCapability("deviceGroup", "KOBITON");
-            driver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
+            mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
+            mobileDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+        }
+        driver = mobileDriver;
     }
 
     @Before("@Desktop")
-    public void openWebBrowser(){
-        String platform;
-        platform = (System.getProperty("desktopPlatform") == null) ? "firefox" : System.getProperty("desktopPlatform");
-        System.out.println(System.getProperty("desktopPlatform"));
-        switch (platform) {
-            case "Chrome":
-                WebDriverManager.chromedriver().setup();
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--headless");
-                options.addArguments("window-size=1920,1080");
-                options.addArguments("user-data-dir=target/ChromeData");
-                driver = new ChromeDriver(options);
-                break;
-            case "firefox":
-                WebDriverManager.firefoxdriver().setup();
-                FirefoxBinary firefoxBinary = new FirefoxBinary();
-                firefoxBinary.addCommandLineOptions("--headless");
-                FirefoxOptions firefoxOptions = new FirefoxOptions();
-                firefoxOptions.setBinary(firefoxBinary);
-                driver = new FirefoxDriver(firefoxOptions);
-                break;
+    public void openWebBrowser() {
+        if (desktopDriver == null) {
+            String platform;
+            platform = (System.getProperty("desktopPlatform") == null) ? "chrome" : System.getProperty("desktopPlatform");
+            System.out.println(System.getProperty("desktopPlatform"));
+            switch (platform) {
+                case "chrome":
+                    WebDriverManager.chromedriver().setup();
+                    ChromeOptions options = new ChromeOptions();
+                    options.addArguments("--headless");
+                    options.addArguments("window-size=1920,1080");
+//                    options.addArguments("user-data-dir=target/ChromeData");
+                    desktopDriver = new ChromeDriver(options);
+                    break;
+                case "firefox":
+                    WebDriverManager.firefoxdriver().setup();
+                    FirefoxBinary firefoxBinary = new FirefoxBinary();
+                    firefoxBinary.addCommandLineOptions("--headless");
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
+                    firefoxOptions.setBinary(firefoxBinary);
+                    desktopDriver = new FirefoxDriver(firefoxOptions);
+                    break;
+                case "safari":
+                    desktopDriver = new SafariDriver();
+                    break;
+                //                  *ipad using chrome emulation(to be added if needed)*
+//            case "ipad":
+//                Map<String, String> mobileEmulation = new HashMap<>();
+//                mobileEmulation.put("deviceName", "Nexus 5");
+//
+//                ChromeOptions chromeOptions = new ChromeOptions();
+//                chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+//
+//                desktopDriver = new ChromeDriver(chromeOptions);
+            }
+            desktopDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+            desktopDriver.manage().window().maximize();
         }
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-        driver.manage().window().maximize();
+        driver = desktopDriver;
     }
 
     public static WebDriver getDriver() {
@@ -97,13 +117,13 @@ public class hooks extends Utils {
 
     @After
     public static void AfterMethod(Scenario scenario) {
+        driver.get("https://google.com");
         if (scenario.isFailed()) {
             // Take a screenshot...
             final byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             // embed it in the report.
             scenario.attach(screenshot, "image/png", "failure");
         }
-        driver.close();
     }
 
     @AfterStep
@@ -115,6 +135,16 @@ public class hooks extends Utils {
         } else {
             scenario.attach(screenshot, "image/png", "Success");
 
+        }
+    }
+
+    public static void closeDriver() {
+        desktopDriver = null;
+        mobileDriver = null;
+        try {
+            driver.close();
+            driver.quit();
+        } catch (Exception e) {
         }
 
     }
