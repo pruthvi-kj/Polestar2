@@ -14,81 +14,72 @@ import java.util.List;
 
 public class Polestar2 extends commonMethods {
     WebDriver driver;
+    @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
+    private List<WebElement> footerLinks;
+    @FindBy(xpath = "//a[@href and @class='css-1p608u1' or @class='css-nofjbs' or @class='css-stpt7n']")
+    private List<WebElement> headerLinks;
+    @FindBy(xpath = "//a[@href='/us/sign-up-newsletter/?redirect-url=/us/polestar-2/']")
+    private WebElement SubscribeBtn;
+    @FindBy(xpath = "//div[text()='United States']")
+    private WebElement changeLocation;
+    @FindBy(xpath = "//h1[text()='Select your region']")
+    private WebElement regionSelect;
+    @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
+    private WebElement acceptCookies;
+    @FindBy(xpath = "//button[@class='css-1y07xyn']")
+    private WebElement closeBtn;
+    @FindBy(xpath = "//button[@title='menu']")
+    private WebElement headerMenu;
+    @FindBy(xpath = "//a[@href='/us/polestar-1/' and @class='css-1p608u1']")
+    private WebElement polestar1Explore;
+    @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
+    private WebElement polestar1Configure;
+    @FindBy(xpath = "//a[@href='/us/polestar-2/' and @class='css-1p608u1']")
+    private WebElement polestar2Explore;
+    @FindBy(xpath = "//a[@href='/us/polestar-2/configurator/' and @class='css-1p608u1']")
+    private WebElement polestar2Configure;
+    @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
+    private WebElement polestar2TestDrive;
+    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-0']")
+    private WebElement polestarDotComFooterMobile;
+    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-1']")
+    private WebElement polestarFooterMobile;
+    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-2']")
+    private WebElement discoverFooterMobile;
+    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-3']")
+    private WebElement socialFooterMobile;
 
     public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-        Thread.sleep(3000);
         try {
+            Thread.sleep(3000);
 //                WebDriverWait wait = new WebDriverWait(driver, 3);
 //                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
 //                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath
 //                        ("//button[@class='optanon-allow-all accept-cookies-button']")));
             clickOnElement(acceptCookies);
         } catch (Exception e) {
-            throw e;
         }
     }
 
-    @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
-    private List<WebElement> footerLinks;
-
-    @FindBy(xpath = "//a[@href and @class='css-1p608u1' or @class='css-nofjbs' or @class='css-stpt7n']")
-    private List<WebElement> headerLinks;
-
-    @FindBy(xpath = "//a[@href='/us/sign-up-newsletter/?redirect-url=/us/polestar-2/']")
-    private WebElement SubscribeBtn;
-
-    @FindBy(xpath = "//div[text()='United States']")
-    private WebElement changeLocation;
-
-    @FindBy(xpath = "//h1[text()='Select your region']")
-    private WebElement regionSelect;
-
-    @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
-    private WebElement acceptCookies;
-
-    @FindBy(xpath = "//button[@class='css-1y07xyn']")
-    private WebElement closeBtn;
-
-    @FindBy(xpath = "//button[@title='menu']")
-    private WebElement headerMenu;
-
-    @FindBy(xpath = "//a[@href='/us/polestar-1/' and @class='css-1p608u1']")
-    private WebElement polestar1Explore;
-
-    @FindBy(xpath = "//a[@href='/us/polestar-1/configurator/' and @class='css-nofjbs']")
-    private WebElement polestar1Configure;
-
-    @FindBy(xpath = "//a[@href='/us/polestar-2/' and @class='css-1p608u1']")
-    private WebElement polestar2Explore;
-
-    @FindBy(xpath = "//a[@href='/us/polestar-2/configurator/' and @class='css-1p608u1']")
-    private WebElement polestar2Configure;
-
-    @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
-    private WebElement polestar2TestDrive;
-
-    @FindBy(xpath = "//button[@class='css-1pqb5ae'][1]")
-    private WebElement polestarDotComFooterMobile;
-
-    @FindBy(xpath = "//button[@class='css-1pqb5ae'][2]")
-    private WebElement polestarFooterMobile;
-
-    @FindBy(xpath = "//button[@class='css-1pqb5ae'][3]")
-    private WebElement discoverFooterMobile;
-
-    @FindBy(xpath = "//button[@class='css-1pqb5ae'][4]")
-    private WebElement socialFooterMobile;
-
+    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
+        while (i.hasNext()) {
+            WebElement he = i.next();
+            String hText = he.getText();
+            if (hText != null && hText.equalsIgnoreCase(linktext)) {
+                return he;
+            }
+        }
+        return null;
+    }
 
     public void navigateToFooter() throws InterruptedException {
         ((JavascriptExecutor) driver)
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         Thread.sleep(1000);
     }
-
 
     public boolean isElementVisible(String userPageTitle) {
         boolean isDisplayed = false;
@@ -162,17 +153,6 @@ public class Polestar2 extends commonMethods {
                     clickOnElement(checkElementExists(h, linkText));
                 }
         }
-    }
-
-    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
-        while (i.hasNext()) {
-            WebElement he = i.next();
-            String hText = he.getText();
-            if (hText != null && hText.equalsIgnoreCase(linktext)) {
-                return he;
-            }
-        }
-        return null;
     }
 
     public String getPageTitle() throws InterruptedException {

@@ -8,6 +8,9 @@ import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 import resources.Utils;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 public class Steps extends Utils {
     WebDriver driver;
     Polestar2 p;
@@ -48,6 +51,16 @@ public class Steps extends Utils {
                 System.out.println(isVisible);
                 Assert.assertEquals(true, isVisible);
                 break;
+            case "Careers":
+                Set<String> a = driver.getWindowHandles();
+                int count=0;
+                for(String handle : a) {
+                    driver.switchTo().window(handle);
+                    if (driver.getTitle().equalsIgnoreCase(userPageTitle.replace("*", "|"))) {
+                        count++;
+                    }
+                }
+                    Assert.assertEquals(1,count);
             default:
                 Assert.assertEquals(userPageTitle.replace("*", "|"), driver.getTitle());
         }
