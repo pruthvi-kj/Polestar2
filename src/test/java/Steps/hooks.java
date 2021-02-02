@@ -79,8 +79,8 @@ public class hooks extends Utils {
                 case "chrome":
                     WebDriverManager.chromedriver().setup();
                     ChromeOptions options = new ChromeOptions();
-                    options.addArguments("--headless");
-                    options.addArguments("window-size=1920,1080");
+//                    options.addArguments("--headless");
+//                    options.addArguments("window-size=1920,1080");
 //                    options.addArguments("user-data-dir=target/ChromeData");
                     desktopDriver = new ChromeDriver(options);
                     break;

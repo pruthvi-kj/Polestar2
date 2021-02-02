@@ -1,7 +1,7 @@
 Feature: Verify the navigation in Header
 
   Background: Which paltform and browser to be initilaised
-    Given User lands on "https://www.polestar.com/us/polestar-2/" page
+    Given User lands on "https://www.polestar.com/us/polestar-2/" page and has to work on "HeaderAndFooter"
 
   @Header @Desktop
   Scenario Outline: Verify the Header links on Polestar 2 homepage

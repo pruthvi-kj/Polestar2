@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Polestar2 extends commonMethods {
+public class HeaderAndFooter extends commonMethods {
+
     WebDriver driver;
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
     private List<WebElement> footerLinks;
@@ -49,7 +50,7 @@ public class Polestar2 extends commonMethods {
     @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-3']")
     private WebElement socialFooterMobile;
 
-    public Polestar2(WebDriver driver) {
+    public HeaderAndFooter(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();

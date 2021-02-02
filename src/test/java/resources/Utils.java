@@ -6,6 +6,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 public class Utils {
@@ -23,6 +25,17 @@ public class Utils {
             wait.until(ExpectedConditions.titleContains(userPageTitle));
         } catch (Exception e) {
         }
+    }
+    public static void callMethod(Class cls,Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method=cls.getDeclaredMethod(methodName);
+        method.invoke(obj);
+
+    }
+
+    public static Object callMethod(Class cls,Object obj, String methodName, String arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method=cls.getDeclaredMethod(methodName, String.class);
+        Object o=method.invoke(obj, arg1);
+        return o;
     }
 
 }
