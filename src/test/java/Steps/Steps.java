@@ -1,5 +1,6 @@
 package Steps;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -102,4 +103,23 @@ public class Steps extends Utils {
         callMethod(cls,obj,"moveCursorTo",Menu);
 //        p.moveCursorTo(Menu);
     }
+
+    @When("we read the Web Elements data from excel {string} and sheet {string}")
+    public void weReadTheWebElementsDataFromExcelAndSheet(String path, String sheetName)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"readData",path,sheetName);
+    }
+
+    @And("extract the required data")
+    public void extractTheRequiredData() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"extractData");
+    }
+
+    @Then("write extracted data to excel {string}")
+    public void writeExtractedDataToExcel(String path) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"writeData", path);
+    }
+
+
+
 }

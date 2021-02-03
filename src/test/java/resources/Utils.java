@@ -29,12 +29,17 @@ public class Utils {
     public static void callMethod(Class cls,Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method=cls.getDeclaredMethod(methodName);
         method.invoke(obj);
-
     }
 
     public static Object callMethod(Class cls,Object obj, String methodName, String arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method=cls.getDeclaredMethod(methodName, String.class);
         Object o=method.invoke(obj, arg1);
+        return o;
+    }
+
+    public static Object callMethod(Class cls,Object obj, String methodName, String arg1,String arg2) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method=cls.getDeclaredMethod(methodName, String.class,String.class);
+        Object o=method.invoke(obj, arg1,arg2);
         return o;
     }
 

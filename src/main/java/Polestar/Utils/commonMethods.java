@@ -1,15 +1,125 @@
 package Polestar.Utils;
 
+import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.WebElement;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import java.util.Iterator;
+
 public class commonMethods {
+    private static XSSFWorkbook workbook;
+    private static FileInputStream fis;
 
     public static void clickOnElement(WebElement element) {
         try {
             element.click();
         } catch (Exception e) {
             throw e;
-
         }
+    }
+
+    public static XSSFSheet getSheet(String excelLocation, String sheetName) {
+        XSSFSheet sheet;
+        try {
+            fis = new FileInputStream(excelLocation);
+            workbook = new XSSFWorkbook(fis);
+        }catch (IOException e){
+            System.out.println("Unable to find/access excel"+ e);
+        }
+
+        int countSheets = workbook.getNumberOfSheets();
+        for (int i = 0; i < countSheets; i++) {
+            if (workbook.getSheetName(i).equalsIgnoreCase(sheetName)) {
+                sheet = workbook.getSheetAt(i);
+                return sheet;
+//                Iterator<Row> rows = sheet.iterator();
+//                Row firstRow = rows.next();
+//                Iterator<Cell> cell = firstRow.cellIterator();
+//                int k = 0;
+//
+//                while (cell.hasNext()) {
+//                    Cell value = cell.next();
+//                    if (value.getStringCellValue().equalsIgnoreCase("TestCase")) {
+//                        coloumn = k;
+//                        break;
+//                    }
+//                    k++;
+//                }
+//
+//                while (rows.hasNext()) {
+//                    Row r = rows.next();
+//                    if (r.getCell(coloumn).getStringCellValue().equalsIgnoreCase(TestCaseID)) {
+//                        //after you grab purchase testcase row = pull all the data of that row and feed into test
+//                        Iterator<Cell> cv = r.cellIterator();
+//                        while (cv.hasNext()) {
+//                            Cell c = cv.next();
+//                            if (c.getCellType() == CellType.STRING) {
+//                                a.add(c.getStringCellValue());
+//                            } else {
+//                                a.add(NumberToTextConverter.toText(c.getNumericCellValue()));
+//                            }
+//                        }
+//                    }
+//
+//                }
+            }
+        }
+        return null;
+    }
+    public static void closeInputStream() throws IOException {
+        fis.close();
+    }
+
+    public static ArrayList<String> getExcelData(Row r, int count) {
+        ArrayList<String> a = new ArrayList<String>();
+        Iterator<Cell> cv = r.cellIterator();
+        while (cv.hasNext()) {
+            Cell c = cv.next();
+            if (c.getColumnIndex() < count) {
+                if (c.getCellType() == CellType.STRING) {
+                    a.add(c.getStringCellValue());
+                    System.out.println(c.getStringCellValue());
+                } else {
+                    a.add(NumberToTextConverter.toText(c.getNumericCellValue()));
+                }
+            }
+        }
+        return a;
+    }
+
+    public static void writeToExcel(String path) throws IOException {
+        FileOutputStream fos = new FileOutputStream(path);
+        //write data in the excel file
+        workbook.write(fos);
+        //close output stream
+        fos.close();
+
+    }
+
+    public int getColumnIndex(Row firstRow,String a) {
+        Iterator<Cell> cell = firstRow.cellIterator();
+        int k = 0;
+        while (cell.hasNext()) {
+            while (cell.hasNext()) {
+                Cell value = cell.next();
+                if (value.getStringCellValue().equalsIgnoreCase(a)) {
+                    return k;
+                }
+                k++;
+            }
+        }
+        return 0;
+    }
+
+    public void writeToCell(Row r, int index, String text){
+        r.createCell(index).setCellValue(text);
     }
 }

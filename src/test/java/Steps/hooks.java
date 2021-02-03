@@ -115,7 +115,7 @@ public class hooks extends Utils {
         return driver;
     }
 
-    @After
+    @After("@Footer,@Header")
     public static void AfterMethod(Scenario scenario) {
         driver.get("https://google.com");
         if (scenario.isFailed()) {
