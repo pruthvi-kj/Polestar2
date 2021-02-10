@@ -8,12 +8,11 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class HeaderAndFooter extends commonMethods {
 
+    Map<String, WebElement> mapping = new HashMap<String, WebElement>();
     WebDriver driver;
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
     private List<WebElement> footerLinks;
@@ -63,18 +62,21 @@ public class HeaderAndFooter extends commonMethods {
             clickOnElement(acceptCookies);
         } catch (Exception e) {
         }
+        mapping.put("SUBSCRIBE",SubscribeBtn);
+        mapping.put("CHANGE LOCATION",changeLocation);
+        mapping.put("CLOSE",closeBtn);
+        mapping.put("POLESTAR 1 EXPLORE",polestar1Explore);
+        mapping.put("POLESTAR 1 CONFIGURE",polestar1Configure);
+        mapping.put("POLESTAR 2 CONFIGURE",polestar2Configure);
+        mapping.put("POLESTAR 2 EXPLORE",polestar2Explore);
+        mapping.put("POLESTAR 2 TEST DRIVE",polestar2TestDrive);
+        mapping.put("POLESTAR.COM",polestarDotComFooterMobile);
+        mapping.put("POLESTAR",polestarFooterMobile);
+        mapping.put("DISCOVER",discoverFooterMobile);
+        mapping.put("SOCIAL",socialFooterMobile);
+        mapping.put("SELECT YOUR REGION",regionSelect);
     }
 
-    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
-        while (i.hasNext()) {
-            WebElement he = i.next();
-            String hText = he.getText();
-            if (hText != null && hText.equalsIgnoreCase(linktext)) {
-                return he;
-            }
-        }
-        return null;
-    }
 
     public void navigateToFooter() throws InterruptedException {
         ((JavascriptExecutor) driver)
@@ -84,75 +86,33 @@ public class HeaderAndFooter extends commonMethods {
 
     public boolean isElementVisible(String userPageTitle) {
         boolean isDisplayed = false;
-        switch (userPageTitle) {
-            case "Select your region":
                 try {
-                    isDisplayed = regionSelect.isDisplayed();
-                    break;
-                } catch (Exception e) {
-                }
-            default:
-                ;
-        }
+                    isDisplayed = mapping.get(userPageTitle.toUpperCase()).isDisplayed();
+                } catch (Exception e) {}
         return isDisplayed;
     }
 
     public void clickOnTheLink(String linkText) {
-        List<String> a = new ArrayList<String>();
-        a.add("addsfg");
-        a.add("sdfsdfg");
-        a.add("dfdsfd");
-        switch (linkText) {
-            case "Subscribe":
-                clickOnElement(SubscribeBtn);
-                break;
-            case "Change Location":
-                clickOnElement(changeLocation);
-                break;
-            case "Close":
-                clickOnElement(closeBtn);
-                break;
-            case "Header Menu":
-                ((JavascriptExecutor) driver)
-                        .executeScript("window.scrollTo(0,0)");
-                clickOnElement(headerMenu);
-                break;
-            case "Polestar 1 Explore":
-                clickOnElement(polestar1Explore);
-                break;
-            case "Polestar 1 Configure":
-                Actions ac = new Actions(driver);
-                ac.moveToElement(polestar1Configure).click().build().perform();
-                break;
-            case "Polestar 2 Configure":
-                clickOnElement(polestar2Configure);
-                break;
-            case "Polestar 2 Explore":
-                clickOnElement(polestar2Explore);
-                break;
-            case "Polestar 2 Test Drive":
-                clickOnElement(polestar2TestDrive);
-                break;
-            case "polestar.com":
-                clickOnElement(polestarDotComFooterMobile);
-                break;
-            case "Polestar":
-                clickOnElement(polestarFooterMobile);
-                break;
-            case "Discover":
-                clickOnElement(discoverFooterMobile);
-                break;
-            case "Social":
-                clickOnElement(socialFooterMobile);
-                break;
-            default:
-                Iterator<WebElement> h = headerLinks.iterator();
-                //to check if there are header elements are present
-                if (!h.hasNext()) {
-                    clickOnElement(checkElementExists(footerLinks.iterator(), linkText));
-                } else if (h.hasNext()) {
-                    clickOnElement(checkElementExists(h, linkText));
-                }
+        WebElement ele = mapping.get(linkText.toUpperCase());
+        if(ele!=null & linkText!="Header Menu"){
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }
+        else {
+            switch (linkText) {
+                case "Header Menu":
+                    ((JavascriptExecutor) driver)
+                            .executeScript("window.scrollTo(0,0)");
+                    clickOnElement(headerMenu);
+                    break;
+                default:
+                    Iterator<WebElement> h = headerLinks.iterator();
+                    //to check if there are header elements are present
+                    if (!h.hasNext()) {
+                        clickOnElement(checkElementExists(footerLinks.iterator(), linkText));
+                    } else if (h.hasNext()) {
+                        clickOnElement(checkElementExists(h, linkText));
+                    }
+            }
         }
     }
 

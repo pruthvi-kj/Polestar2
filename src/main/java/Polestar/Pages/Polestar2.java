@@ -7,15 +7,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Polestar2 extends commonMethods {
     ArrayList<String> a = new ArrayList<String>();
@@ -29,6 +26,18 @@ public class Polestar2 extends commonMethods {
     private List<WebElement> keyStatsHighlights;
     @FindBy(className = "css-3ycsxw")
     private List<WebElement> keyStatsHighlightsLease;
+    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Panoramic glass roof']/..//div[text()='See More']")
+    private WebElement panoramicGlassRoofSeeMore;
+    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Frameless mirrors']/..//div[text()='See More']")
+    private WebElement seeMoreFrameless;
+    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Pixel LED lights']/..//div[text()='See More']")
+    private WebElement seeMoreLEDLights;
+    @FindBy(className = "css-138i4qw")
+    private WebElement exteriorView;
+
+    Map<String, WebElement> mapping = new HashMap<String, WebElement>();
+
+
 
     public Polestar2(WebDriver driver) {
         this.driver = driver;
@@ -40,43 +49,34 @@ public class Polestar2 extends commonMethods {
 //                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
 //                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath
 //                        ("//button[@class='optanon-allow-all accept-cookies-button']")));
-            clickOnElement(acceptCookies);
+//            clickOnElement(acceptCookies);
+            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0,0)");
         } catch (Exception e) {
         }
+        mapping.put("EXTERIOR PDP",exteriorView);
+        mapping.put("PANORAMIC GLASS ROOF SEE MORE", panoramicGlassRoofSeeMore);
     }
 
-    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
-        while (i.hasNext()) {
-            WebElement he = i.next();
-            String hText = he.getText();
-            if (hText != null && hText.equalsIgnoreCase(linktext)) {
-                return he;
-            }
-        }
-        return null;
+    public void clickOnButton(String category){
+        clickOnElement(mapping.get(category.toUpperCase()));
     }
 
-    public void navigateToFooter() throws InterruptedException {
-        ((JavascriptExecutor) driver)
-                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        Thread.sleep(1000);
+    public void navigateToView(String view) throws InterruptedException {
+        navigateUsingJSToAnElement(driver,mapping.get(view.toUpperCase()));
+//        switch (view){
+//            case "Exterior PDP":
+//                navigateUsingJSToAnElement(driver,exteriorView);
+//        }
+    }
+
+    public String getViewName(String view){
+        System.out.println(view);
+        System.out.println(mapping.get(view.toUpperCase()));
+        return mapping.get(view.toUpperCase()).getText();
     }
 
 
-//    public void findAttributes(){
-//        System.out.println(dummy.getText());
-//        System.out.println(dummy.getCssValue("font-family"));
-//        System.out.println(dummy.getCssValue("font-style"));
-//        System.out.println(dummy.getCssValue("color"));
-//        System.out.println(dummy.getCssValue("font-size"));
-//    }
-//
-//    public void scollToElement(){
-//        Actions ac = new Actions(driver);
-//        ac.moveToElement(dummy).build().perform();
-//    }
-
-    public void readData(String path, String sheetName) throws IOException {
+    public void readData(String path, String sheetName) {
         sheet = getSheet(path, sheetName);
     }
 
@@ -95,8 +95,7 @@ public class Polestar2 extends commonMethods {
             a = getExcelData(r,textIndex);
 
             WebElement elementToVerify = driver.findElement(By.xpath(a.get(0)));
-            Actions ac = new Actions(driver);
-            ac.moveToElement(elementToVerify).build().perform();
+            scrollToElementUsingActionClass(driver,elementToVerify);
             if (elementToVerify.getText().equalsIgnoreCase(a.get(1))) {
                 r.createCell(textIndex).setCellValue(elementToVerify.getText());
                 r.createCell(fontIndex).setCellValue(elementToVerify.getCssValue("font-family"));

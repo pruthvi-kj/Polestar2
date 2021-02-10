@@ -13,20 +13,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 public class Steps extends Utils {
-    WebDriver driver;
-    Object p;
-    Class cls;
-    Object obj;
-    static String polestar2PageTitle = "Polestar 2 – The 100% electric car | Polestar US";
+    private static WebDriver driver;
+    private static Class<?> cls;
+    private static Object obj;
+    final private static String polestar2PageTitle = "Polestar 2 – The 100% electric car | Polestar US";
 
 
     @Given("User lands on {string} page and has to work on {string}")
     public void user_lands_on_page(String url, String page) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         driver = hooks.getDriver();
         driver.get(url);
-        cls = Class.forName("Polestar.Pages." + page + "");
+        cls = Class.forName("Polestar.Pages."+page);
         System.out.println(cls.getConstructor(WebDriver.class));
-        Constructor ct = cls.getConstructor(WebDriver.class);
+        Constructor<?> ct = cls.getConstructor(WebDriver.class);
         obj = ct.newInstance(driver);
     }
 
@@ -41,25 +40,23 @@ public class Steps extends Utils {
         callMethod(cls, obj, "navigateToFooter");
 //        p.navigateToFooter();
     }
-
     @When("clicks on {string}")
     public void clicks_on(String linkName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         callMethod(cls, obj, "clickOnTheLink", linkName);
 //        p.clickOnTheLink(linkName);
 
     }
-
     @Then("Verify the user lands on {string}")
     public void verify_the_user_lands_on(String userPageTitle) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         boolean isVisible;
-        waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
         switch (userPageTitle) {
             case "Select your region":
                 isVisible = (boolean) callMethod(cls, obj, "isElementVisible", userPageTitle);
 //                isVisible = p.isElementVisible(userPageTitle);
-                Assert.assertEquals(true, isVisible);
+                Assert.assertTrue(isVisible);
                 break;
             case "Careers":
+                waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
                 Set<String> a = driver.getWindowHandles();
                 int count = 0;
                 for (String handle : a) {
@@ -70,19 +67,27 @@ public class Steps extends Utils {
                 }
                 Assert.assertEquals(1, count);
             default:
-                Assert.assertEquals(userPageTitle.replace("*", "|"), driver.getTitle());
+                if (userPageTitle.toUpperCase().endsWith("PDP")|| userPageTitle.toUpperCase().endsWith("modal")) {
+                    System.out.println(userPageTitle.split(" PDP")[0]);
+                    Assert.assertEquals(userPageTitle.split(" PDP")[0],(String) callMethod(cls, obj,
+                            "getViewName",userPageTitle));
+                }
+                else {
+                    waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
+                    Assert.assertEquals(userPageTitle.replace("*", "|"), driver.getTitle());
+                }
         }
-    }
+        }
 
-    @Then("when user clicks on back verify that back user lands on Polestar {int} homepage")
-    public void when_user_clicks_on_back_verify_that_back_user_lands_on_polestar_homepage(Integer int1) {
+    @Then("when user clicks on back verify that back user lands on Polestar2 homepage")
+    public void when_user_clicks_on_back_verify_that_back_user_lands_on_polestar_homepage() {
         driver.navigate().back();
         waitUntilPageTitle(driver, polestar2PageTitle);
         Assert.assertEquals(polestar2PageTitle, driver.getTitle());
     }
 
-    @Then("when user clicks on close user lands on Polestar {int} homepage")
-    public void when_user_clicks_on_close_user_lands_on_polestar_homepage(Integer int1) throws InterruptedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    @Then("when user clicks on close user lands on Polestar2 homepage")
+    public void when_user_clicks_on_close_user_lands_on_polestar_homepage() throws InterruptedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 //        p.clickOnTheLink("Close");
         callMethod(cls, obj, "clickOnTheLink", "Close");
         boolean isVisible;
@@ -120,6 +125,13 @@ public class Steps extends Utils {
         callMethod(cls,obj,"writeData", path);
     }
 
+    @And("clicks on {string} option for {string}")
+    public void clicksOnOptionFor(String button, String category) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"clickOnButton",category+" "+button);
+    }
 
-
+    @When("user navigates to {string}")
+    public void userNavigatesTo(String view) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"navigateToView",view);
+    }
 }

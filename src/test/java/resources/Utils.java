@@ -26,9 +26,10 @@ public class Utils {
         } catch (Exception e) {
         }
     }
-    public static void callMethod(Class cls,Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static Object callMethod(Class cls,Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method=cls.getDeclaredMethod(methodName);
-        method.invoke(obj);
+        Object o=method.invoke(obj);
+        return o;
     }
 
     public static Object callMethod(Class cls,Object obj, String methodName, String arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

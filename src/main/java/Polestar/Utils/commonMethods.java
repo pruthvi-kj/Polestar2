@@ -3,6 +3,8 @@ package Polestar.Utils;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.FileInputStream;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.openqa.selenium.interactions.Actions;
+
 import java.util.Iterator;
 
 public class commonMethods {
@@ -118,8 +122,29 @@ public class commonMethods {
         }
         return 0;
     }
+    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
+        while (i.hasNext()) {
+            WebElement he = i.next();
+            String hText = he.getText();
+            if (hText != null && hText.equalsIgnoreCase(linktext)) {
+                return he;
+            }
+        }
+        return null;
+    }
 
     public void writeToCell(Row r, int index, String text){
         r.createCell(index).setCellValue(text);
+    }
+
+    public void navigateUsingJSToAnElement(WebDriver driver, WebElement element) throws InterruptedException {
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView(true);", element);
+        Thread.sleep(1000);
+    }
+
+    public void scrollToElementUsingActionClass(WebDriver driver, WebElement element){
+        Actions ac = new Actions(driver);
+        ac.moveToElement(element).build().perform();
     }
 }
