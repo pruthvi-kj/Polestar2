@@ -10,9 +10,11 @@ import resources.Utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class Steps extends Utils {
+    private static ArrayList<String> expectedCallout,actualCallout= new ArrayList<>();
     private static WebDriver driver;
     private static Class<?> cls;
     private static Object obj;
@@ -24,7 +26,6 @@ public class Steps extends Utils {
         driver = hooks.getDriver();
         driver.get(url);
         cls = Class.forName("Polestar.Pages."+page);
-        System.out.println(cls.getConstructor(WebDriver.class));
         Constructor<?> ct = cls.getConstructor(WebDriver.class);
         obj = ct.newInstance(driver);
     }
@@ -46,8 +47,8 @@ public class Steps extends Utils {
 //        p.clickOnTheLink(linkName);
 
     }
-    @Then("Verify the user lands on {string}")
-    public void verify_the_user_lands_on(String userPageTitle) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    @Then("Verify the user navigates to {string}")
+    public void verify_the_user_navigates_to(String userPageTitle) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         boolean isVisible;
         switch (userPageTitle) {
             case "Select your region":
@@ -67,15 +68,8 @@ public class Steps extends Utils {
                 }
                 Assert.assertEquals(1, count);
             default:
-                if (userPageTitle.toUpperCase().endsWith("PDP")|| userPageTitle.toUpperCase().endsWith("modal")) {
-                    System.out.println(userPageTitle.split(" PDP")[0]);
-                    Assert.assertEquals(userPageTitle.split(" PDP")[0],(String) callMethod(cls, obj,
-                            "getViewName",userPageTitle));
-                }
-                else {
                     waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
                     Assert.assertEquals(userPageTitle.replace("*", "|"), driver.getTitle());
-                }
         }
         }
 
@@ -117,7 +111,7 @@ public class Steps extends Utils {
 
     @And("extract the required data")
     public void extractTheRequiredData() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        callMethod(cls,obj,"extractData");
+        callMethod(cls,obj,"extractDataOfElements");
     }
 
     @Then("write extracted data to excel {string}")
@@ -133,5 +127,23 @@ public class Steps extends Utils {
     @When("user navigates to {string}")
     public void userNavigatesTo(String view) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         callMethod(cls,obj,"navigateToView",view);
+    }
+
+    @Then("Verify the user lands on {string}")
+    public void verifyTheUserLandsOn(String section) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Assert.assertEquals(section,(String) callMethod(cls, obj,"getViewName",section));
+    }
+
+    @And("extract all the callout for the section {string}")
+    public void extractAllTheCalloutForTheSection(String section) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        callMethod(cls,obj,"readData","src/main/resources/excel-2.xlsx",section);
+        expectedCallout =(ArrayList<String>) callMethod(cls,obj,"extractCalloutFromExcel");
+        actualCallout =(ArrayList<String>) callMethod(cls,obj,"getTextOfElements",section);
+
+    }
+
+    @Then("if all the callouts are matching")
+    public void ifAllTheCalloutsAreMatching() {
+        Assert.assertEquals(expectedCallout,actualCallout);
     }
 }

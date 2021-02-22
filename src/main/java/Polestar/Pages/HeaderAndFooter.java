@@ -54,7 +54,7 @@ public class HeaderAndFooter extends commonMethods {
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(6000);
 //                WebDriverWait wait = new WebDriverWait(driver, 3);
 //                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
 //                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath

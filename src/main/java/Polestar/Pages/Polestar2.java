@@ -4,20 +4,20 @@ import Polestar.Utils.commonMethods;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.util.*;
 
 public class Polestar2 extends commonMethods {
-    ArrayList<String> a = new ArrayList<String>();
-    XSSFSheet sheet;
-    WebDriver driver;
+    private static XSSFSheet sheet;
+    private static WebDriver driver;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
     @FindBy(className = "css-1ink1h8")
@@ -34,44 +34,58 @@ public class Polestar2 extends commonMethods {
     private WebElement seeMoreLEDLights;
     @FindBy(className = "css-138i4qw")
     private WebElement exteriorView;
+    @FindBy(className = "css-j07xvw")
+    private WebElement orderNowCta;
+    @FindBy(className = "css-zgmw7k")
+    private WebElement heroUnit;
+    @FindBy(className = "css-1bs17j1")
+    private WebElement bookATestDriveHU;
 
-    Map<String, WebElement> mapping = new HashMap<String, WebElement>();
 
 
+    Map<String, WebElement> mapping = new HashMap<>();
 
-    public Polestar2(WebDriver driver) {
+
+    public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
-            Thread.sleep(3000);
-//                WebDriverWait wait = new WebDriverWait(driver, 3);
-//                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
-//                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath
-//                        ("//button[@class='optanon-allow-all accept-cookies-button']")));
-//            clickOnElement(acceptCookies);
-            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0,0)");
+            try {
+                WebDriverWait wait=new WebDriverWait(driver,15);
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        (By.xpath("//button[@class='optanon-allow-all accept-cookies-button']"))));
+                wait.until(ExpectedConditions.elementToBeClickable
+                        (acceptCookies));
+                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Thread.sleep(2000);
+            clickOnElement(acceptCookies);
         } catch (Exception e) {
+            throw e;
         }
-        mapping.put("EXTERIOR PDP",exteriorView);
+        mapping.put("EXTERIOR PDP", exteriorView);
         mapping.put("PANORAMIC GLASS ROOF SEE MORE", panoramicGlassRoofSeeMore);
+        mapping.put("ORDER NOW", orderNowCta);
+        mapping.put("BOOK A TEST DRIVE",bookATestDriveHU);
+
     }
 
-    public void clickOnButton(String category){
+    public void clickOnButton(String category) {
         clickOnElement(mapping.get(category.toUpperCase()));
     }
 
-    public void navigateToView(String view) throws InterruptedException {
-        navigateUsingJSToAnElement(driver,mapping.get(view.toUpperCase()));
-//        switch (view){
-//            case "Exterior PDP":
-//                navigateUsingJSToAnElement(driver,exteriorView);
-//        }
+    public void clickOnTheLink(String linkText) {
+        clickOnElement(mapping.get(linkText.toUpperCase()));
     }
 
-    public String getViewName(String view){
-        System.out.println(view);
-        System.out.println(mapping.get(view.toUpperCase()));
+    public void navigateToView(String view) throws InterruptedException {
+        navigateUsingJSToAnElement(driver, mapping.get(view.toUpperCase()));
+    }
+
+    public String getViewName(String view) {
         return mapping.get(view.toUpperCase()).getText();
     }
 
@@ -80,7 +94,7 @@ public class Polestar2 extends commonMethods {
         sheet = getSheet(path, sheetName);
     }
 
-        public void extractData() throws IOException {
+    public void extractDataOfElements() throws IOException {
         Iterator<Row> rows = sheet.iterator();
         Row firstRow = rows.next();
         //getting the index for writing data
@@ -88,15 +102,19 @@ public class Polestar2 extends commonMethods {
         int fontIndex = getColumnIndex(firstRow, "Actual Font Family");
         int colourIndex = getColumnIndex(firstRow, "Actual Font Colour");
         int sizeIndex = getColumnIndex(firstRow, "Actual Font Size");
+        int xpathIndex= getColumnIndex(firstRow,"className");
 
         while (rows.hasNext()) {
             Row r = rows.next();
-            System.out.println("seperator");
-            a = getExcelData(r,textIndex);
-
-            WebElement elementToVerify = driver.findElement(By.xpath(a.get(0)));
-            scrollToElementUsingActionClass(driver,elementToVerify);
-            if (elementToVerify.getText().equalsIgnoreCase(a.get(1))) {
+            String a = getCellValue(r, xpathIndex);
+            WebElement elementToVerify = null;
+            try{
+                elementToVerify = driver.findElement(By.xpath(a));}
+            catch (Exception e){
+                System.out.println(e.getCause());
+            }
+            scrollToElementUsingActionClass(driver, elementToVerify);
+            if (elementToVerify.getText().equalsIgnoreCase(a)) {
                 r.createCell(textIndex).setCellValue(elementToVerify.getText());
                 r.createCell(fontIndex).setCellValue(elementToVerify.getCssValue("font-family"));
                 r.createCell(sizeIndex).setCellValue(elementToVerify.getCssValue("font-size"));
@@ -105,10 +123,37 @@ public class Polestar2 extends commonMethods {
                 r.createCell(textIndex).setCellValue("Element Not Found");
             }
         }
-            closeInputStream();
+        closeInputStream();
     }
+
     public void writeData(String path) throws IOException {
         writeToExcel(path);
+    }
+
+    public ArrayList<String> extractCalloutFromExcel() throws IOException {
+        ArrayList<String> calloutExpected = new ArrayList<>();
+        Iterator<Row> rows = sheet.iterator();
+        Row firstRow = rows.next();
+        int index = getColumnIndex(firstRow, "Callouts");
+        //read data from excel and put it in an array list
+
+        while (rows.hasNext()) {
+            Row r = rows.next();
+            calloutExpected.add(getCellValue(r, index));
+        }
+        closeInputStream();
+        return calloutExpected;
+    }
+
+    public ArrayList<String> getTextOfElements(String section){
+        ArrayList<String>  calloutActual = new ArrayList<>();
+        //read data from UI and put it in an array list
+        List<WebElement> elementToVerify = driver.findElements(By.xpath("//p[text()='"+section+"']/../..//p[@data-testid]"));
+        scrollToElementUsingActionClass(driver, elementToVerify.get(0));
+        for(WebElement e: elementToVerify){
+            calloutActual.add(e.getText());
+        }
+        return calloutActual;
     }
 }
 
