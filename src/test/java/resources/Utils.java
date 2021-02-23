@@ -26,21 +26,22 @@ public class Utils {
         } catch (Exception e) {
         }
     }
-    public static Object callMethod(Class cls,Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method=cls.getDeclaredMethod(methodName);
-        Object o=method.invoke(obj);
+
+    public static Object callMethod(Class cls, Object obj, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = cls.getDeclaredMethod(methodName);
+        Object o = method.invoke(obj);
         return o;
     }
 
-    public static Object callMethod(Class cls,Object obj, String methodName, String arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method=cls.getDeclaredMethod(methodName, String.class);
-        Object o=method.invoke(obj, arg1);
+    public static Object callMethod(Class cls, Object obj, String methodName, String arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = cls.getDeclaredMethod(methodName, String.class);
+        Object o = method.invoke(obj, arg1);
         return o;
     }
 
-    public static Object callMethod(Class cls,Object obj, String methodName, String arg1,String arg2) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method=cls.getDeclaredMethod(methodName, String.class,String.class);
-        Object o=method.invoke(obj, arg1,arg2);
+    public static Object callMethod(Class cls, Object obj, String methodName, String arg1, String arg2) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = cls.getDeclaredMethod(methodName, String.class, String.class);
+        Object o = method.invoke(obj, arg1, arg2);
         return o;
     }
 

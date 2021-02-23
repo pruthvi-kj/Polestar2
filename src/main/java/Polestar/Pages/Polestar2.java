@@ -1,6 +1,8 @@
 package Polestar.Pages;
 
 import Polestar.Utils.commonMethods;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.openqa.selenium.By;
@@ -16,8 +18,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class Polestar2 extends commonMethods {
+    private static final Logger LOG = LogManager.getLogger(Polestar2.class);
+
     private static XSSFSheet sheet;
     private static WebDriver driver;
+    Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
     @FindBy(className = "css-1ink1h8")
@@ -42,34 +47,30 @@ public class Polestar2 extends commonMethods {
     private WebElement bookATestDriveHU;
 
 
-
-    Map<String, WebElement> mapping = new HashMap<>();
-
-
     public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
             try {
-                WebDriverWait wait=new WebDriverWait(driver,15);
+                WebDriverWait wait = new WebDriverWait(driver, 15);
                 wait.until(ExpectedConditions.visibilityOfElementLocated(
                         (By.xpath("//button[@class='optanon-allow-all accept-cookies-button']"))));
                 wait.until(ExpectedConditions.elementToBeClickable
                         (acceptCookies));
                 wait.until(ExpectedConditions.visibilityOf(acceptCookies));
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error(e.getMessage());
             }
             Thread.sleep(2000);
             clickOnElement(acceptCookies);
         } catch (Exception e) {
-            throw e;
+            LOG.error(e.getMessage());
         }
         mapping.put("EXTERIOR PDP", exteriorView);
         mapping.put("PANORAMIC GLASS ROOF SEE MORE", panoramicGlassRoofSeeMore);
         mapping.put("ORDER NOW", orderNowCta);
-        mapping.put("BOOK A TEST DRIVE",bookATestDriveHU);
+        mapping.put("BOOK A TEST DRIVE", bookATestDriveHU);
 
     }
 
@@ -102,16 +103,17 @@ public class Polestar2 extends commonMethods {
         int fontIndex = getColumnIndex(firstRow, "Actual Font Family");
         int colourIndex = getColumnIndex(firstRow, "Actual Font Colour");
         int sizeIndex = getColumnIndex(firstRow, "Actual Font Size");
-        int xpathIndex= getColumnIndex(firstRow,"className");
+        int xpathIndex = getColumnIndex(firstRow, "className");
 
         while (rows.hasNext()) {
             Row r = rows.next();
             String a = getCellValue(r, xpathIndex);
             WebElement elementToVerify = null;
-            try{
-                elementToVerify = driver.findElement(By.xpath(a));}
-            catch (Exception e){
-                System.out.println(e.getCause());
+            try {
+                elementToVerify = driver.findElement(By.xpath(a));
+            } catch (Exception e) {
+                LOG.error(e.getCause());
+                throw e;
             }
             scrollToElementUsingActionClass(driver, elementToVerify);
             if (elementToVerify.getText().equalsIgnoreCase(a)) {
@@ -145,12 +147,12 @@ public class Polestar2 extends commonMethods {
         return calloutExpected;
     }
 
-    public ArrayList<String> getTextOfElements(String section){
-        ArrayList<String>  calloutActual = new ArrayList<>();
+    public ArrayList<String> getTextOfElements(String section) {
+        ArrayList<String> calloutActual = new ArrayList<>();
         //read data from UI and put it in an array list
-        List<WebElement> elementToVerify = driver.findElements(By.xpath("//p[text()='"+section+"']/../..//p[@data-testid]"));
+        List<WebElement> elementToVerify = driver.findElements(By.xpath("//p[text()='" + section + "']/../..//p[@data-testid]"));
         scrollToElementUsingActionClass(driver, elementToVerify.get(0));
-        for(WebElement e: elementToVerify){
+        for (WebElement e : elementToVerify) {
             calloutActual.add(e.getText());
         }
         return calloutActual;

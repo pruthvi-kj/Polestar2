@@ -45,8 +45,8 @@ Feature: Verify Polestar2 page
     When extract all the callout for the section "<section>"
     Then if all the callouts are matching
     Examples:
-      | section      |
-      | Safety       |
+      | section |
+      | Safety  |
 
 
 

@@ -6,12 +6,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.Color;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -72,14 +70,14 @@ public class commonMethods {
 
     public static String getCellValue(Row r, int index) {
         String value;
-        try{
-        if (r.getCell(index).getCellType() == CellType.STRING) {
-            value=r.getCell(index).getStringCellValue();
-        } else {
-            value=NumberToTextConverter.toText(r.getCell(index).getNumericCellValue());
-        }
+        try {
+            if (r.getCell(index).getCellType() == CellType.STRING) {
+                value = r.getCell(index).getStringCellValue();
+            } else {
+                value = NumberToTextConverter.toText(r.getCell(index).getNumericCellValue());
+            }
             return value;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Underlying exception: " + e.getCause());
         }
         return null;
@@ -95,6 +93,17 @@ public class commonMethods {
 
     }
 
+    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
+        while (i.hasNext()) {
+            WebElement he = i.next();
+            String hText = he.getText();
+            if (hText != null && hText.equalsIgnoreCase(linktext)) {
+                return he;
+            }
+        }
+        return null;
+    }
+
     public int getColumnIndex(Row firstRow, String a) {
         Iterator<Cell> cell = firstRow.cellIterator();
         int k = 0;
@@ -108,17 +117,6 @@ public class commonMethods {
             }
         }
         return 0;
-    }
-
-    public static WebElement checkElementExists(Iterator<WebElement> i, String linktext) {
-        while (i.hasNext()) {
-            WebElement he = i.next();
-            String hText = he.getText();
-            if (hText != null && hText.equalsIgnoreCase(linktext)) {
-                return he;
-            }
-        }
-        return null;
     }
 
     public void writeToCell(Row r, int index, String text) {

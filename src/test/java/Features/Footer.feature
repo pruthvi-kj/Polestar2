@@ -3,7 +3,7 @@
 #
 #  Background: Which paltform and browser to be initilaised
 #    Given User lands on "https://www.polestar.com/us/polestar-2/" page and has to work on "HeaderAndFooter"
-#
+
 #  @Footer @Desktop
 #  Scenario Outline: Verify the navigation to different pages from the footer of Polestar 2 US page
 #    Given User is in "Polestar2" page

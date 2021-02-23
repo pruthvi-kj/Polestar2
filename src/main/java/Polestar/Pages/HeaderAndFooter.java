@@ -1,14 +1,20 @@
 package Polestar.Pages;
 
 import Polestar.Utils.commonMethods;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class HeaderAndFooter extends commonMethods {
 
@@ -26,7 +32,7 @@ public class HeaderAndFooter extends commonMethods {
     private WebElement regionSelect;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
-    @FindBy(xpath = "//button[@class='css-1y07xyn']")
+    @FindBy(xpath = "//button[@class='css-s6oy8']")
     private WebElement closeBtn;
     @FindBy(xpath = "//button[@title='menu']")
     private WebElement headerMenu;
@@ -54,27 +60,34 @@ public class HeaderAndFooter extends commonMethods {
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
-            Thread.sleep(6000);
-//                WebDriverWait wait = new WebDriverWait(driver, 3);
-//                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
-//                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath
-//                        ("//button[@class='optanon-allow-all accept-cookies-button']")));
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, 15);
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        (By.xpath("//button[@class='optanon-allow-all accept-cookies-button']"))));
+                wait.until(ExpectedConditions.elementToBeClickable
+                        (acceptCookies));
+                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Thread.sleep(2000);
             clickOnElement(acceptCookies);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        mapping.put("SUBSCRIBE",SubscribeBtn);
-        mapping.put("CHANGE LOCATION",changeLocation);
-        mapping.put("CLOSE",closeBtn);
-        mapping.put("POLESTAR 1 EXPLORE",polestar1Explore);
-        mapping.put("POLESTAR 1 CONFIGURE",polestar1Configure);
-        mapping.put("POLESTAR 2 CONFIGURE",polestar2Configure);
-        mapping.put("POLESTAR 2 EXPLORE",polestar2Explore);
-        mapping.put("POLESTAR 2 TEST DRIVE",polestar2TestDrive);
-        mapping.put("POLESTAR.COM",polestarDotComFooterMobile);
-        mapping.put("POLESTAR",polestarFooterMobile);
-        mapping.put("DISCOVER",discoverFooterMobile);
-        mapping.put("SOCIAL",socialFooterMobile);
-        mapping.put("SELECT YOUR REGION",regionSelect);
+        mapping.put("SUBSCRIBE", SubscribeBtn);
+        mapping.put("CHANGE LOCATION", changeLocation);
+        mapping.put("CLOSE", closeBtn);
+        mapping.put("POLESTAR 1 EXPLORE", polestar1Explore);
+        mapping.put("POLESTAR 1 CONFIGURE", polestar1Configure);
+        mapping.put("POLESTAR 2 CONFIGURE", polestar2Configure);
+        mapping.put("POLESTAR 2 EXPLORE", polestar2Explore);
+        mapping.put("POLESTAR 2 TEST DRIVE", polestar2TestDrive);
+        mapping.put("POLESTAR.COM", polestarDotComFooterMobile);
+        mapping.put("POLESTAR", polestarFooterMobile);
+        mapping.put("DISCOVER", discoverFooterMobile);
+        mapping.put("SOCIAL", socialFooterMobile);
+        mapping.put("SELECT YOUR REGION", regionSelect);
     }
 
 
@@ -86,18 +99,18 @@ public class HeaderAndFooter extends commonMethods {
 
     public boolean isElementVisible(String userPageTitle) {
         boolean isDisplayed = false;
-                try {
-                    isDisplayed = mapping.get(userPageTitle.toUpperCase()).isDisplayed();
-                } catch (Exception e) {}
+        try {
+            isDisplayed = mapping.get(userPageTitle.toUpperCase()).isDisplayed();
+        } catch (Exception e) {
+        }
         return isDisplayed;
     }
 
     public void clickOnTheLink(String linkText) {
         WebElement ele = mapping.get(linkText.toUpperCase());
-        if(ele!=null & linkText!="Header Menu"){
+        if (ele != null & linkText != "Header Menu") {
             clickOnElement(mapping.get(linkText.toUpperCase()));
-        }
-        else {
+        } else {
             switch (linkText) {
                 case "Header Menu":
                     ((JavascriptExecutor) driver)
