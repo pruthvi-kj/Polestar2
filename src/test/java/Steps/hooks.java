@@ -17,8 +17,8 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class hooks extends Utils {
-    private static RemoteWebDriver driver, desktopDriver, mobileDriver;
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
+    private static RemoteWebDriver driver, desktopDriver, mobileDriver;
 
     @Before("@Mobile")
     public static void openMobileBrowser() throws IOException {

@@ -4,6 +4,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import resources.Utils;
@@ -24,9 +25,15 @@ public class Steps extends Utils {
     private static Object obj;
 
     @Given("User lands on {string} page and has to work on {string}")
-    public void user_lands_on_page(String url, String page) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    public void user_lands_on_page(String url, String page) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, InterruptedException {
         driver = hooks.getDriver();
-        driver.get(url);
+        if (!driver.getTitle().equalsIgnoreCase(polestar2PageTitle)) {
+            driver.get(url);
+        } else {
+            ((JavascriptExecutor) driver)
+                    .executeScript("window.scrollTo(0, 0)");
+            Thread.sleep(1000);
+        }
         cls = Class.forName("Polestar.Pages." + page);
         Constructor<?> ct = cls.getConstructor(WebDriver.class);
         obj = ct.newInstance(driver);

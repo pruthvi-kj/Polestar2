@@ -20,12 +20,6 @@ public class ListenerPlugin implements ConcurrentEventListener {
 
     private static final Logger LOG = LogManager.getLogger(ListenerPlugin.class);
     private static final TestReport testReport = new TestReport();
-    private static EventHandler<TestRunStarted> beforeAll = event -> {
-        // something that needs doing before everything
-    };
-    private EventHandler<TestRunFinished> afterAll = event -> {
-        hooks.closeDriver();
-    };
 
     public void onTestRunStarted(TestRunStarted testRunStarted) {
         TestInitialization.init();
@@ -44,6 +38,7 @@ public class ListenerPlugin implements ConcurrentEventListener {
     }
 
     public void onTestRunFinished(TestRunFinished testRunFinished) {
+        hooks.closeDriver();
         TestReport.closeThreadLocalCollections();
     }
 
@@ -88,8 +83,6 @@ public class ListenerPlugin implements ConcurrentEventListener {
 
     @Override
     public void setEventPublisher(EventPublisher eventPublisher) {
-        eventPublisher.registerHandlerFor(TestRunStarted.class, beforeAll);
-        eventPublisher.registerHandlerFor(TestRunFinished.class, afterAll);
         eventPublisher.registerHandlerFor(TestRunStarted.class, this::onTestRunStarted);
         eventPublisher.registerHandlerFor(TestStepFinished.class, this::onTestStepFinished);
         eventPublisher.registerHandlerFor(TestCaseStarted.class, this::onTestCaseStarted);

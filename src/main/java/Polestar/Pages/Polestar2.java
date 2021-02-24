@@ -149,8 +149,14 @@ public class Polestar2 extends commonMethods {
 
     public ArrayList<String> getTextOfElements(String section) {
         ArrayList<String> calloutActual = new ArrayList<>();
+        List<WebElement> elementToVerify;
         //read data from UI and put it in an array list
-        List<WebElement> elementToVerify = driver.findElements(By.xpath("//p[text()='" + section + "']/../..//p[@data-testid]"));
+        try {
+            elementToVerify = driver.findElements(By.xpath("//p[text()='" +
+                    section + "']/../..//p[@data-testid]"));
+        } catch (Exception e) {
+            throw e;
+        }
         scrollToElementUsingActionClass(driver, elementToVerify.get(0));
         for (WebElement e : elementToVerify) {
             calloutActual.add(e.getText());
