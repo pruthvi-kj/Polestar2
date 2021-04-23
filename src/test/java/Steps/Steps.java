@@ -1,21 +1,27 @@
 package Steps;
 
+import Polestar.DataMembers.FuelPrices;
+import Polestar.DataMembers.RangeData;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import resources.Utils;
+import resources.apiCall;
+import utils.TestInitialization;
+import utils.TestReport;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.*;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
+
+
+
 
 public class Steps extends Utils {
     final private static String polestar2PageTitle = "Polestar 2 – The 100% electric car | Polestar US";
@@ -23,26 +29,30 @@ public class Steps extends Utils {
     private static RemoteWebDriver driver;
     private static Class<?> cls;
     private static Object obj;
+    private static String globalChargingSectionName;
+    private final static int batterySize=78;
+    private static double globalChargerType;
+    private static TestReport testReport;
+    private static final double polestar2EnergyConsumption=0.193;
+    private static final double fuelVehicleEnergyConsumption=0.083;
+    private static final double weeksInYear=52.1775;
+    private static final double milesTOKm=1.609;
 
-    @Given("User lands on {string} page and has to work on {string}")
-    public void user_lands_on_page(String url, String page) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, InterruptedException {
+
+
+
+    @Given("User lands on {string} page")
+    public void user_lands_on_page(String url) throws InterruptedException {
+        testReport= TestInitialization.getInstance();
         driver = hooks.getDriver();
-        if (!driver.getTitle().equalsIgnoreCase(polestar2PageTitle)) {
-            driver.get(url);
-        } else {
-            ((JavascriptExecutor) driver)
-                    .executeScript("window.scrollTo(0, 0)");
-            Thread.sleep(1000);
-        }
-        cls = Class.forName("Polestar.Pages." + page);
-        Constructor<?> ct = cls.getConstructor(WebDriver.class);
-        obj = ct.newInstance(driver);
+        driver.get(url);
     }
 
     @Given("User is in {string} page")
-    public void user_is_in_page(String page) {
-        waitUntilPageTitle(driver, polestar2PageTitle);
-        assertEquals(driver.getTitle(), polestar2PageTitle, "Title mismatch");
+    public void user_is_in_page(String page) throws InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException {
+        cls = Class.forName("Polestar.Pages." + page);
+        Constructor<?> ct = cls.getConstructor(WebDriver.class);
+        obj = ct.newInstance(driver);
     }
 
     @When("user navigates to footer")
@@ -99,7 +109,7 @@ public class Steps extends Utils {
         Thread.sleep(2000);
         isVisible = (boolean) callMethod(cls, obj, "isElementVisible", "Select your region");
 //        isVisible = p.isElementVisible("Select your region");
-        assertTrue(isVisible == false, "Elemenst is still visible");
+        assertFalse(isVisible, "Elemenst is still visible");
     }
 
     @When("user navigates to header")
@@ -150,11 +160,136 @@ public class Steps extends Utils {
         callMethod(cls, obj, "readData", "src/main/resources/excel.xlsx", section);
         expectedCallout = (ArrayList<String>) callMethod(cls, obj, "extractCalloutFromExcel");
         actualCallout = (ArrayList<String>) callMethod(cls, obj, "getTextOfElements", section);
-
     }
 
     @Then("if all the callouts are matching")
     public void ifAllTheCalloutsAreMatching() {
         assertEquals(actualCallout, expectedCallout, "Callouts are not matching");
     }
+
+    @And("verify that all the links are valid")
+    public void verifyLinkValid() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"getAttributes","href");
+
+    }
+
+    @And("user slides upto {int} px")
+    public void userSlidesUpto(int slideX) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"updateSliderPosition", Integer.toString(slideX));
+    }
+
+    @Then("verify the miles calculated")
+    public void verifyTheMilesCalculated() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        RangeData rangeData= (RangeData) callMethod(cls,obj,"calculateMiles");
+        int expectedValue=0;
+        if(rangeData.rangePercentage==100){
+            expectedValue= (int) ((rangeData.numberOfCharge)*100*2.33f);
+        }
+        else expectedValue= (int) (((rangeData.numberOfCharge-1)*100*2.33f)+((100-rangeData.rangePercentage)*2.33f));
+        int actualValue= rangeData.miles;
+        if(Math.ceil(expectedValue)==actualValue) {
+            assertEquals(Math.ceil(expectedValue), actualValue, "Miles do not match");
+            testReport.log("Calculated Miles- " + Math.ceil(expectedValue) + " miles");
+        }else if(Math.floor(expectedValue)==actualValue) {
+            assertEquals(Math.ceil(expectedValue), actualValue, "Miles do not match");
+            testReport.log("Calculated Miles- "+Math.floor(expectedValue)+" miles" );
+        }else {
+        testReport.log("Calculated Miles- "+expectedValue+" miles" );
+        assertEquals(expectedValue,actualValue,"Miles do not match");
+        }
+        testReport.log("Actual Miles- "+ actualValue+" miles");
+    }
+
+    @Then("nav bar highlight is on {string}")
+    public void navBarHighlightIsOn(String section) {
+
+    }
+
+    @When("clicks on Learn More under {string} section")
+    public void clicksOnUnderSection(String sectionName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"navigateToView",sectionName);
+        callMethod(cls, obj, "clickOnLearnMore");
+    }
+
+    @Then("Verify the user lands on modal")
+    public void verifyTheUserLandsOnModal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        assertTrue((Boolean) callMethod(cls,obj,"onModal"),"Unable to open modal");
+    }
+
+    @Then("Verify that all the tab headings are clickable")
+    public void verifyThatAllTheTabHeadingsAreClickable() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        assertTrue((Boolean) callMethod(cls,obj,"ifSectionClickable"));
+    }
+
+    @When("clicks on See More under {string} feature")
+    public void clicksOnSeeMoreUnderSection(String feature) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"navigateToView","Exterior");
+        callMethod(cls,obj,"clickOnSeeMore",feature);
+
+    }
+
+    @And("clicks on {string} section")
+    public void clicksOnSection(String chargingSectionName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        globalChargingSectionName=chargingSectionName;
+        callMethod(cls,obj,"getChargingModalSection",chargingSectionName);
+    }
+
+    @And("clicks on {double} kW charger")
+    public void clicksOnKWCharger(double chargerType) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        globalChargerType=chargerType;
+        callMethod(cls,obj,"clickOnChargerType",globalChargingSectionName, chargerType);
+
+    }
+
+    @And("slider positions are set at {int} px and {int} px")
+    public void sliderPositionsAreSetAtPxAndPx(int startChargePercentage, int endChargePercentage) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"updateSliderPosition",startChargePercentage, endChargePercentage);
+
+    }
+
+    @Then("verify the charge time calculated")
+    public void verifyTheChargeTimeCalculated() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        List<String> chargeData= (ArrayList<String>) callMethod(cls,obj,"getChargeDuration");
+        double duration=((batterySize*0.01)*(Integer.parseInt(chargeData.get(2))-Integer.parseInt(chargeData.get(1))))
+                /(globalChargerType*0.9);
+        int expectedHours = (int) Math.floor(duration);
+        int expectedMinutes = (int) Math.floor((duration- expectedHours)*60);
+        String[] split = chargeData.get(0).split(":");
+        int actualHours=Integer.parseInt(split[0]);
+        int actualMinutes= Integer.parseInt(split[1].split(" ")[0]);
+        boolean hoursValidation= expectedHours==actualHours? true : false;
+        boolean minutesValidation= expectedMinutes==actualMinutes? true: false;
+        testReport.log("Calculated Duration- "+expectedHours+":"+expectedMinutes+" hours");
+        testReport.log("Actual Duration- "+chargeData.get(0));
+
+        assertTrue(hoursValidation && minutesValidation, "Hours mismatch");
+
+    }
+
+    @And("clicks on {string} tab")
+    public void clicksOnTab(String tabName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        callMethod(cls,obj,"clickOnTabInSavings",tabName,globalChargingSectionName);
+
+    }
+
+    @Then("verify the savings")
+    public void verifyTheSavings() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, FileNotFoundException {
+        String stateCode = null;
+        callMethod(cls,obj,"navigateToView","Range");
+        callMethod(cls, obj, "clickOnLearnMore");
+        callMethod(cls,obj,"getChargingModalSection","Savings");
+        HashMap<String,String> actualSavingsValue= (HashMap<String, String>) callMethod(cls,obj,"getSavingsValue", "Savings");
+        for (Map.Entry<String, String > entry : actualSavingsValue.entrySet())
+            testReport.log(entry.getKey()+"- "+entry.getValue());
+
+        HashMap<String,String> expectedSavingsValue= new HashMap<>();
+        int miles=0;
+
+        stateCode=getStateCode("");
+        FuelPrices price=apiCall.getFuelPrice(stateCode==null? "US":"US_"+stateCode);
+        expectedSavingsValue.put("Expected Year Polestar 2", String.valueOf(Math.round
+                ((fuelVehicleEnergyConsumption*weeksInYear*(miles==0?233:miles)*milesTOKm)/12)*price.electricityPrice));
+    }
+
+
 }

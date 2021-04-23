@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 
 public class TestInitialization {
+    private static TestReport testReport;
 
     private static final Logger LOG = LogManager.getLogger(TestInitialization.class);
     private static boolean isInit;
@@ -21,8 +22,12 @@ public class TestInitialization {
         if (!isInit) {
 
             TestReport.init();
-            TestReport testReport = new TestReport();
+            testReport = new TestReport();
             isInit = true;
         }
     }
+    public static TestReport getInstance(){
+        return testReport;
+    }
+
 }

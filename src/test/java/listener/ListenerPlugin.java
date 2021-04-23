@@ -23,6 +23,7 @@ public class ListenerPlugin implements ConcurrentEventListener {
 
     public void onTestRunStarted(TestRunStarted testRunStarted) {
         TestInitialization.init();
+        System.out.flush();
         LOG.info(String.format("Test run started at: %s", LocalDateTime.now().toString()));
     }
 

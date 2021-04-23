@@ -1,16 +1,21 @@
 package Polestar.Pages;
 
 import Polestar.Utils.commonMethods;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,8 +23,8 @@ import java.util.Map;
 
 public class HeaderAndFooter extends commonMethods {
 
-    Map<String, WebElement> mapping = new HashMap<String, WebElement>();
-    WebDriver driver;
+    private static Map<String, WebElement> mapping = new HashMap<String, WebElement>();
+    private static WebDriver driver;
     @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
     private List<WebElement> footerLinks;
     @FindBy(xpath = "//a[@href and @class='css-1p608u1' or @class='css-nofjbs' or @class='css-stpt7n']")
@@ -54,6 +59,9 @@ public class HeaderAndFooter extends commonMethods {
     private WebElement discoverFooterMobile;
     @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-3']")
     private WebElement socialFooterMobile;
+    @FindBy(how= How.CSS , using= "[class='css-1ee9ltk'] a[href]")
+    private List<WebElement> footerLinks1;
+    private static final Logger LOG = LogManager.getLogger(HeaderAndFooter.class);
 
     public HeaderAndFooter(WebDriver driver) {
         this.driver = driver;
@@ -145,5 +153,21 @@ public class HeaderAndFooter extends commonMethods {
             throw e;
         }
 
+    }
+
+    public void getAttributes(String attName) throws Exception {
+        System.out.println(footerLinks1.size());
+
+        for(WebElement e: footerLinks1){
+            HttpURLConnection connection = (HttpURLConnection)new URL(e.getAttribute(attName)).openConnection();
+            LOG.info("some text");
+            System.out.println("dgfdg");
+            LOG.info(e.getAttribute(attName));
+            connection.setRequestMethod("HEAD");
+            connection.connect();
+            LOG.info("Error Stream"+connection.getErrorStream());
+            LOG.info("Response Message"+connection.getResponseMessage());
+            LOG.info("Error Stream"+connection.getResponseCode());
+        }
     }
 }

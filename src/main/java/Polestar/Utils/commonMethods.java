@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class commonMethods {
     private static XSSFWorkbook workbook;
@@ -28,6 +29,12 @@ public class commonMethods {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public static void clickOnElementJS(WebDriver driver, WebElement element)
+    {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+
     }
 
     public static XSSFSheet getSheet(String excelLocation, String sheetName) {
@@ -132,6 +139,16 @@ public class commonMethods {
     public void scrollToElementUsingActionClass(WebDriver driver, WebElement element) {
         Actions ac = new Actions(driver);
         ac.moveToElement(element).build().perform();
+    }
+    public static WebElement getSectionToNavigate(List<WebElement> sections, String view){
+//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("data-name").equalsIgnoreCase(view)).
+//                collect(Collectors.toList());
+        for(WebElement e: sections){
+            if(e.getAttribute("data-name").equalsIgnoreCase(view)){
+                return e;
+            }
+        }
+         return null;
     }
 
 }

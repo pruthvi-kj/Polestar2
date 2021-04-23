@@ -2,11 +2,11 @@
 #
 #
 #  Background: Which paltform and browser to be initilaised
-#    Given User lands on "https://www.polestar.com/us/polestar-2/" page and has to work on "HeaderAndFooter"
-
+#    Given User lands on "https://www.polestar.com/us/polestar-2/" page
+#
 #  @Footer @Desktop
 #  Scenario Outline: Verify the navigation to different pages from the footer of Polestar 2 US page
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to footer
 #    And clicks on "<link>"
 #    Then Verify the user navigates to "<page>"
@@ -36,7 +36,7 @@
 #
 #  @Footer @Desktop
 #  Scenario: Verify the Change Location link from Polestar 2 homepage footer
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to footer
 #    And clicks on "Change Location"
 #    Then Verify the user navigates to "Select your region"
@@ -44,7 +44,7 @@
 #
 #  @Footer @Mobile
 #  Scenario: Verify the Change Location link from Polestar 2 homepage footer
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to footer
 #    And clicks on "Change Location"
 #    Then Verify the user navigates to "Select your region"
@@ -52,7 +52,7 @@
 #
 #  @Footer @Mobile
 #  Scenario Outline: Verify the navigation to different pages from the footer of Polestar 2 US page in Mobile platform
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to footer
 #    And clicks on "<footerLink>"
 #    And clicks on "<link>"
@@ -81,3 +81,9 @@
 #      | Social       | YouTube            | Polestar - YouTube                                             |
 #      | Social       | Subscribe          | Newsletter sign up                                             |
 #
+#
+#@Desktop
+#Scenario: Verify footer links
+#Given User is in "HeaderAndFooter" page
+#When user navigates to footer
+#Then verify that all the links are valid

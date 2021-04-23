@@ -1,11 +1,11 @@
 #Feature: Verify the navigation in Header
 #
 #  Background: Which paltform and browser to be initilaised
-#    Given User lands on "https://www.polestar.com/us/polestar-2/" page and has to work on "HeaderAndFooter"
+#    Given User lands on "https://www.polestar.com/us/polestar-2/" page
 #
 #  @Header @Desktop
 #  Scenario Outline: Verify the Header links on Polestar 2 homepage
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to header
 #    And clicks on "<link>"
 #    Then Verify the user navigates to "<page>"
@@ -27,7 +27,7 @@
 #
 #  @Header @Desktop
 #  Scenario Outline: Verify the Header links on Polestar 2 homepage for Hamburger Menu
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to header
 #    And user moves the mouse to "<menuOption>"
 #    And clicks on "<link>"
@@ -45,7 +45,7 @@
 #
 #  @Header @Mobile
 #  Scenario Outline: Verify the Header links on Polestar 2 homepage for Hamburger Menu for Mobile platform
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to header
 #    And clicks on "<menuOption>"
 #    And clicks on "<link>"
@@ -62,7 +62,7 @@
 #
 #  @Header @Mobile
 #  Scenario Outline: Verify the Header links on Polestar 2 homepage for Mobile platform
-#    Given User is in "Polestar2" page
+#    Given User is in "HeaderAndFooter" page
 #    When user navigates to header
 #    And clicks on "<link>"
 #    Then Verify the user navigates to "<page>"

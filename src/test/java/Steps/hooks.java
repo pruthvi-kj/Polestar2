@@ -112,7 +112,6 @@ public class hooks extends Utils {
         if (desktopDriver == null) {
             String platform;
             platform = (System.getProperty("desktopPlatform") == null) ? "chrome" : System.getProperty("desktopPlatform");
-            System.out.println(System.getProperty("desktopPlatform"));
             switch (platform) {
                 case "chrome":
                     WebDriverManager.chromedriver().setup();
