@@ -21,7 +21,7 @@ public class Utils {
 
     public static String getDeviceProperty(String key) throws IOException {
         Properties prop = new Properties();
-        FileInputStream fis = new FileInputStream("src/test/java/resources/device.properties");
+        FileInputStream fis = new FileInputStream("src/test/resources/device.properties");
         prop.load(fis);
         return prop.getProperty(key);
     }
@@ -29,7 +29,7 @@ public class Utils {
     public static String getURL(String key) throws IOException {
         Properties prop = new Properties();
         String readEnv=(System.getProperty("environment")==null?"PROD":System.getProperty("environment")).toUpperCase();
-        FileInputStream fis = new FileInputStream("src/test/java/resources/"+readEnv+".properties");
+        FileInputStream fis = new FileInputStream("src/test/resources/"+readEnv+".properties");
         prop.load(fis);
         return prop.getProperty(key);
     }
@@ -82,7 +82,7 @@ public class Utils {
         Map<String, String> stateCodeList= new HashMap<>();
         FileInputStream fis;
         try {
-            fis = new FileInputStream("src/main/resources/excel.xlsx");
+            fis = new FileInputStream("src/test/resources/excel.xlsx");
             workbook = new XSSFWorkbook(fis);
         } catch (IOException e) {
             System.out.println("Unable to find/access excel" + e);

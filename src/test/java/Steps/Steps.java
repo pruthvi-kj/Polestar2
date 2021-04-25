@@ -160,7 +160,7 @@ public class Steps extends Utils {
 
     @And("extract all the callout for the section {string}")
     public void extractAllTheCalloutForTheSection(String section) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        callMethod(cls, obj, "readData", "src/main/resources/excel.xlsx", section);
+        callMethod(cls, obj, "readData", "src/test/resources/excel.xlsx", section);
         expectedCallout = (ArrayList<String>) callMethod(cls, obj, "extractCalloutFromExcel");
         actualCallout = (ArrayList<String>) callMethod(cls, obj, "getTextOfElements", section);
     }

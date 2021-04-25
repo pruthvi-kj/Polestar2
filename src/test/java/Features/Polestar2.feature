@@ -3,9 +3,9 @@ Feature: Verify Polestar2 page
 #  @Desktop
 #  Scenario: Verify the font size, colour, text and style of any web element
 #    Given User is in "Polestar2" page
-#    When we read the Web Elements data from excel "src/main/resources/excel.xlsx" and sheet "Locators"
+#    When we read the Web Elements data from excel "src/tes/resources/excel.xlsx" and sheet "Locators"
 #    And extract the required data
-#    Then write extracted data to excel "src/main/resources/excel.xlsx"
+#    Then write extracted data to excel "src/test/resources/excel.xlsx"
 #
 #    @Mobile
 #    Scenario: Verify that when user clicks on Reserve Now will take the user to Configurator Flow
