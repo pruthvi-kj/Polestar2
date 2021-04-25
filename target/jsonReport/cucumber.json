@@ -1,0 +1,89 @@
+[
+  {
+    "line": 1,
+    "elements": [
+      {
+        "start_timestamp": "2021-04-25T11:26:11.468Z",
+        "before": [
+          {
+            "result": {
+              "duration": 2342000000,
+              "status": "passed"
+            },
+            "match": {
+              "location": "Steps.hooks.openWebBrowser()"
+            }
+          }
+        ],
+        "line": 97,
+        "name": "Verify navigation to sections using nav bar",
+        "description": "",
+        "id": "verify-polestar2-page;verify-navigation-to-sections-using-nav-bar",
+        "type": "scenario",
+        "keyword": "Scenario",
+        "steps": [
+          {
+            "result": {
+              "duration": 12926000000,
+              "status": "passed"
+            },
+            "line": 98,
+            "name": "User is in \"Polestar2\" page",
+            "match": {
+              "arguments": [
+                {
+                  "val": "\"Polestar2\"",
+                  "offset": 11
+                }
+              ],
+              "location": "Steps.Steps.user_is_in_page(java.lang.String)"
+            },
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "duration": 785000000,
+              "status": "passed"
+            },
+            "line": 99,
+            "name": "user clicks on \"Range\" section in nav bar",
+            "match": {
+              "arguments": [
+                {
+                  "val": "\"Range\"",
+                  "offset": 15
+                }
+              ],
+              "location": "Steps.Steps.userClicksOnSectionInNavBar(java.lang.String)"
+            },
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "error_message": "java.lang.AssertionError: expected [Range] but found [Polestar 2\n—\nBeautiful. Powerful. Electric.]\n\tat org.testng.Assert.fail(Assert.java:99)\n\tat org.testng.Assert.failNotEquals(Assert.java:1037)\n\tat org.testng.Assert.assertEqualsImpl(Assert.java:140)\n\tat org.testng.Assert.assertEquals(Assert.java:122)\n\tat org.testng.Assert.assertEquals(Assert.java:629)\n\tat org.testng.Assert.assertEquals(Assert.java:639)\n\tat Steps.Steps.verifyThatUserLandsOnTheSameSection(Steps.java:332)\n\tat ✽.verify that user lands on the same section(file:///Users/pruthvikj/IdeaProjects/Polestar2/Polestar2/src/test/java/Features/Polestar2.feature:100)\n",
+              "duration": 3000000,
+              "status": "failed"
+            },
+            "line": 100,
+            "name": "verify that user lands on the same section",
+            "match": {
+              "location": "Steps.Steps.verifyThatUserLandsOnTheSameSection()"
+            },
+            "keyword": "Then "
+          }
+        ],
+        "tags": [
+          {
+            "name": "@Desktop"
+          }
+        ]
+      }
+    ],
+    "name": "Verify Polestar2 page",
+    "description": "",
+    "id": "verify-polestar2-page",
+    "keyword": "Feature",
+    "uri": "file:src/test/java/Features/Polestar2.feature",
+    "tags": []
+  }
+]

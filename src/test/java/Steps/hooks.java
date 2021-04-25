@@ -102,11 +102,6 @@ public class hooks extends Utils {
 
     }
 
-    public static void formURL() {
-        String URL = "https://yml.dev.devhouse.digital/us/yml/";
-
-    }
-
     @Before("@Desktop")
     public void openWebBrowser() {
         if (desktopDriver == null) {

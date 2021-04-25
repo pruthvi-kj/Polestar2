@@ -1,10 +1,5 @@
 Feature: Verify Polestar2 page
 
-  Background: Which page to be loaded
-    Given User lands on "https://user:P0L3574R@yml.staging.devhouse.digital/us/polestar-2-b" page
-#    Given User lands on "https://www.polestar.com/us/polestar-2" page
-
-
 #  @Desktop
 #  Scenario: Verify the font size, colour, text and style of any web element
 #    Given User is in "Polestar2" page
@@ -27,12 +22,6 @@ Feature: Verify Polestar2 page
 #
 #
 #  @Desktop
-#      Scenario: Verify that user lands on Exterior Design PDP
-#        Given User is in "Polestar2" page
-#        When user navigates to "Exterior PDP"
-#        Then Verify the user lands on "Exterior PDP"
-#
-#  @Desktop
 #  Scenario: Verify that Book home a test drive takes user to the Polestar 2 test drive page for US region
 #    Given User is in "Polestar2" page
 #    When user navigates to "Hero Unit"
@@ -50,12 +39,12 @@ Feature: Verify Polestar2 page
 #      | Safety  |
 #
 #
-    @Desktop
-    Scenario: Verify the range calculator
-      Given User is in "Polestar2" page
-      And user navigates to "Range"
-      When user slides upto 20 px
-      Then verify the miles calculated
+#    @Desktop
+#    Scenario: Verify the range calculator
+#      Given User is in "Polestar2" page
+#      And user navigates to "Range"
+#      When user slides upto 20 px
+#      Then verify the miles calculated
 
 #  @Desktop
 #  Scenario: Verify that on clicking on Learn More, user lands on modal
@@ -85,11 +74,29 @@ Feature: Verify Polestar2 page
 #    Then verify the charge time calculated
 
 #  @Desktop
-#  Scenario: Verify the Home charger
+#  Scenario: Verify the Savings calculation for US
 #    Given User is in "Polestar2" page
-#    And user navigates to "Range"
+#    When user navigates to "Range"
+#    Then verify the savings
+
+#  @Desktop
+#  Scenario: Verify the Savings calculation for US
+#    Given User is in "Polestar2" page
+#    When user navigates to "Range"
 #    When user slides upto 40 px
 #    Then verify the savings
 
+#  @Desktop
+#  Scenario: Verify the Savings calculation for US
+#    Given User is in "Polestar2" page
+#    When user navigates to "Range"
+#    And selects "Arizona" as the state
+#    Then verify the savings
+
+  @Desktop
+  Scenario: Verify navigation to sections using nav bar
+    Given User is in "Polestar2" page
+    When user clicks on "Range" section in nav bar
+    Then verify that user lands on the same section
 
 

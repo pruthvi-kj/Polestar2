@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static io.restassured.RestAssured.given;
@@ -41,9 +40,8 @@ public class apiCall {
         String date = js.get("data.getFuelById.gasoline.date");
         String stateCodeResponse = js.get("data.getFuelById.id");
 
-        if(js.get("data.getFuelById")!=null && date.equalsIgnoreCase(new SimpleDateFormat("yyyy-MM-dd")
-                .format(new Timestamp(new Date().getTime()))) && stateCodeResponse.equalsIgnoreCase(stateCode)){
-            return new FuelPrices(js.get("data.getFuelById.gasoline.price"),js.get("data.getFuelById.gasoline.price"));
+        if(stateCodeResponse.equalsIgnoreCase(stateCode)){
+            return new FuelPrices(js.get("data.getElectricityById.average"),js.get("data.getFuelById.gasoline.price"));
         }
         return null;
     }

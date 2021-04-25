@@ -43,6 +43,8 @@
                         <desktopPlatform>${desktopPlatform}</desktopPlatform>
                         <!--suppress UnresolvedMavenProperty -->
                         <mobilePlatform>${mobilePlatform}</mobilePlatform>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <environmnet>${environment}</environmnet>
                     </systemPropertyVariables>
 
                 </configuration>

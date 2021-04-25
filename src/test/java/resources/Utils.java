@@ -26,6 +26,14 @@ public class Utils {
         return prop.getProperty(key);
     }
 
+    public static String getURL(String key) throws IOException {
+        Properties prop = new Properties();
+        String readEnv=(System.getProperty("environment")==null?"PROD":System.getProperty("environment")).toUpperCase();
+        FileInputStream fis = new FileInputStream("src/test/java/resources/"+readEnv+".properties");
+        prop.load(fis);
+        return prop.getProperty(key);
+    }
+
     public static void waitUntilPageTitle(WebDriver driver, String userPageTitle) {
         WebDriverWait wait = new WebDriverWait(driver, 3);
         try {
