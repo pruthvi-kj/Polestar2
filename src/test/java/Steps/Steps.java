@@ -245,7 +245,7 @@ public class Steps extends Utils {
 
     }
 
-    @And("slider positions are set at {int} px and {int} px")
+    @And("slider positions are set at {int} px and {int} px from current position")
     public void sliderPositionsAreSetAtPxAndPx(int startChargePercentage, int endChargePercentage) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         callMethod(cls,obj,"updateSliderPosition",startChargePercentage, endChargePercentage);
 

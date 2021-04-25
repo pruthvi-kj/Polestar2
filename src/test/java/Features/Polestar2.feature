@@ -70,7 +70,7 @@ Feature: Verify Polestar2 page
 #    And clicks on Learn More under "Range" section
 #    And clicks on "Home charging" section
 #    When clicks on 3.7 kW charger
-#    And slider positions are set at 15 px and 100 px
+#    And slider positions are set at 20 px and 150 px from current position
 #    Then verify the charge time calculated
 
 #  @Desktop

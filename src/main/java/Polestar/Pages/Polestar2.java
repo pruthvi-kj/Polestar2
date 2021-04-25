@@ -22,10 +22,9 @@ import utils.TestReport;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
 import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class Polestar2 extends commonMethods{
@@ -101,8 +100,12 @@ public class Polestar2 extends commonMethods{
     private WebElement stateNameId;
     @FindBy(className = "css-18rtpmq")
     private WebElement stateSelectionClearBtn;
-    @FindBy(className = "css-1y7cyv3")
+    @FindBy(className = "css-1knqvy9")
     private List<WebElement> navBarIds;
+    @FindBy(className = "css-1c1kduu")
+    private WebElement navBar;
+    @FindBy(className = "css-1gprnpu")
+    private WebElement selectedNavBar;
     //time="div[data-name='Home charging'] [class='css-15bk8jn']"
     private static TestReport testReport;
     private static WebElement temp;
@@ -158,8 +161,8 @@ public class Polestar2 extends commonMethods{
         List<WebElement> slider=temp.findElements(By.cssSelector(startEndSliderId));
         Actions a= new Actions(driver);
         if((endChargePercentage <= getWidth) && (startChargePercentage < endChargePercentage)){
-            a.moveToElement(slider.get(0),-startChargePercentage,0).click().build().perform();
-            a.moveToElement(slider.get(1),-endChargePercentage,0).click().build().perform();
+            a.moveToElement(slider.get(0),startChargePercentage,0).click().build().perform();
+            a.moveToElement(slider.get(1),endChargePercentage,0).click().build().perform();
         }
         Thread.sleep(1000);
     }
@@ -347,10 +350,13 @@ public class Polestar2 extends commonMethods{
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(stateSelectionClearBtn));
     }
 
-    public String navigateToSectionUsingNavBar(String sectionName){
-        navBarIds.stream().filter(s-> s.getText().equalsIgnoreCase(sectionName)).forEach(s->new Actions(driver)
-                .moveToElement(s).build().perform());
-        return sections.stream().filter(s->s.isDisplayed()).map(s->s.getText()).collect(Collectors.toList()).get(0);
+    public String navigateToSectionUsingNavBar(String sectionName) throws InterruptedException {
+        navBarIds.stream().filter(s-> s.getAttribute("data-label").equalsIgnoreCase(sectionName)).forEach(s->{
+            new Actions(driver).moveToElement(navBar).build().perform();
+            new Actions(driver).moveToElement(s).click().build().perform();
+        });
+        Thread.sleep(2000);
+        return selectedNavBar.getText();
     }
 }
 
