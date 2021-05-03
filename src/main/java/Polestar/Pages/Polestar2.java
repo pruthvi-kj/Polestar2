@@ -42,7 +42,7 @@ public class Polestar2 extends commonMethods{
     private static final String estimatedChargeTime ="css-15bk8jn";
     private static final String startEndChangePercentage ="css-yv1aru";
     private static final String chargingSliderComponent ="[class='css-9lvjku']";
-    private static final String chargerTypeId ="[data-testid]";
+    private static final String chargerTypeId ="[ServicePoints-testid]";
     private static final String chargerTypeIdText ="div:nth-child(2)>p:nth-child(1)";
     private static final String learnOrSeeMoreCta ="div[class='css-ly8tcg']";
 
@@ -106,7 +106,7 @@ public class Polestar2 extends commonMethods{
     private WebElement navBar;
     @FindBy(className = "css-1gprnpu")
     private WebElement selectedNavBar;
-    //time="div[data-name='Home charging'] [class='css-15bk8jn']"
+    //time="div[ServicePoints-name='Home charging'] [class='css-15bk8jn']"
     private static TestReport testReport;
     private static WebElement temp;
 
@@ -170,17 +170,19 @@ public class Polestar2 extends commonMethods{
     public FuelPrices getSavingsValue(String chargingSectionName) throws InterruptedException {
         Thread.sleep(3000);
         List<Long> values= new ArrayList<>();
-        temp= getSectionToNavigate(chargingModalSections,chargingSectionName).findElement(By.cssSelector(savingsValueComponent));
+        temp= getSectionToNavigate(chargingModalSections,chargingSectionName,"ServicePoints-name").findElement(By.cssSelector(savingsValueComponent));
         temp.findElements(By.className(yearMonthSelector)).stream().forEach(s-> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            temp.findElements(By.cssSelector(costForMiles)).stream().forEach(p->
-                    values.add(Long.parseLong(p.getText().split(" ")[1])));
-                    values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().split(" ")[1]));
-            clickOnElement(s);
+            temp.findElements(By.cssSelector(costForMiles)).stream().forEach(p->{
+                scrollToElementUsingActionClass(driver,p);
+                values.add(Long.parseLong(p.getText().split(" ")[1]));
+                values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().split(" ")[1]));
+                clickOnElement(s);
+                    });
         });
 
         return new FuelPrices(values.get(0),values.get(1),values.get(2),values.get(3),values.get(4),values.get(5));
@@ -198,7 +200,7 @@ public class Polestar2 extends commonMethods{
     }
 
         public void clickOnChargerType(String chargingSectionName,double chargerType) throws InterruptedException {
-        temp= getSectionToNavigate(chargingModalSections,chargingSectionName);
+        temp= getSectionToNavigate(chargingModalSections,chargingSectionName,"data-name");
         navigateUsingJSToAnElement(driver,temp.findElement(By.cssSelector(chargingSliderComponent)));
         temp.findElements(By.cssSelector(chargerTypeId)).stream()
                 .filter(s->s.findElement(By.cssSelector(chargerTypeIdText)).getText()
@@ -228,7 +230,7 @@ public class Polestar2 extends commonMethods{
                 return sections.get(10);
             }
         });
-        temp=getSectionToNavigate(sections,view);
+        temp=getSectionToNavigate(sections,view,"data-name");
         navigateUsingJSToAnElement(driver,temp);
     }
 
@@ -244,7 +246,7 @@ public class Polestar2 extends commonMethods{
     public void extractDataOfElements() throws IOException {
         Iterator<Row> rows = sheet.iterator();
         Row firstRow = rows.next();
-        //getting the index for writing data
+        //getting the index for writing ServicePoints
         int textIndex = getColumnIndex(firstRow, "Actual Text");
         int fontIndex = getColumnIndex(firstRow, "Actual Font Family");
         int colourIndex = getColumnIndex(firstRow, "Actual Font Colour");
@@ -284,7 +286,7 @@ public class Polestar2 extends commonMethods{
         Iterator<Row> rows = sheet.iterator();
         Row firstRow = rows.next();
         int index = getColumnIndex(firstRow, "Callouts");
-        //read data from excel and put it in an array list
+        //read ServicePoints from excel and put it in an array list
 
         while (rows.hasNext()) {
             Row r = rows.next();
@@ -297,10 +299,10 @@ public class Polestar2 extends commonMethods{
     public ArrayList<String> getTextOfElements(String section) {
         ArrayList<String> calloutActual = new ArrayList<>();
         List<WebElement> elementToVerify;
-        //read data from UI and put it in an array list
+        //read ServicePoints from UI and put it in an array list
         try {
             elementToVerify = driver.findElements(By.xpath("//p[text()='" +
-                    section + "']/../..//p[@data-testid]"));
+                    section + "']/../..//p[@ServicePoints-testid]"));
         } catch (Exception e) {
             LOG.error(e.getStackTrace());
             throw e;
@@ -327,8 +329,8 @@ public class Polestar2 extends commonMethods{
 
     }
 
-    public boolean onModal(){
-        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).isDisplayed();
+    public String onModal(){
+        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
     }
 
     public boolean ifSectionClickable(){
@@ -351,7 +353,7 @@ public class Polestar2 extends commonMethods{
     }
 
     public String navigateToSectionUsingNavBar(String sectionName) throws InterruptedException {
-        navBarIds.stream().filter(s-> s.getAttribute("data-label").equalsIgnoreCase(sectionName)).forEach(s->{
+        navBarIds.stream().filter(s-> s.getAttribute("ServicePoints-label").equalsIgnoreCase(sectionName)).forEach(s->{
             new Actions(driver).moveToElement(navBar).build().perform();
             new Actions(driver).moveToElement(s).click().build().perform();
         });

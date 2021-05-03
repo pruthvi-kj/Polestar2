@@ -93,10 +93,16 @@ Feature: Verify Polestar2 page
 #    And selects "Arizona" as the state
 #    Then verify the savings
 
-  @Desktop
-  Scenario: Verify navigation to sections using nav bar
-    Given User is in "Polestar2" page
-    When user clicks on "Range" section in nav bar
-    Then verify that user lands on the same section
+#  @Desktop
+#  Scenario: Verify navigation to sections using nav bar
+#    Given User is in "Polestar2" page
+#    When user clicks on "Range" section in nav bar
+#    Then verify that user lands on the same section
 
+#    @Mobile
+#    Scenario: Verify the Savings calculation for US
+#      Given User is in "Polestar2" page
+#      When user navigates to "Range"
+#      And selects "Arizona" as the state
+#      Then verify the savings
 

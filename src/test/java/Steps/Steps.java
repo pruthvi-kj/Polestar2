@@ -9,8 +9,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import resources.Utils;
-import resources.apiCall;
+import UtilsTest.Utils;
+import UtilsTest.apiCall;
 import utils.TestInitialization;
 import utils.TestReport;
 
@@ -45,6 +45,7 @@ public class Steps extends Utils {
     private RangeData rangeData;
     private static String globalActualSectionName;
     private static String globalExpectedSectionName;
+    private static String globalServicePointName;
 
 
 
@@ -127,18 +128,18 @@ public class Steps extends Utils {
 //        p.moveCursorTo(Menu);
     }
 
-    @When("we read the Web Elements data from excel {string} and sheet {string}")
+    @When("we read the Web Elements ServicePoints from excel {string} and sheet {string}")
     public void weReadTheWebElementsDataFromExcelAndSheet(String path, String sheetName)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         callMethod(cls, obj, "readData", path, sheetName);
     }
 
-    @And("extract the required data")
+    @And("extract the required ServicePoints")
     public void extractTheRequiredData() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         callMethod(cls, obj, "extractDataOfElements");
     }
 
-    @Then("write extracted data to excel {string}")
+    @Then("write extracted ServicePoints to excel {string}")
     public void writeExtractedDataToExcel(String path) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         callMethod(cls, obj, "writeData", path);
     }
@@ -172,8 +173,7 @@ public class Steps extends Utils {
 
     @And("verify that all the links are valid")
     public void verifyLinkValid() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        callMethod(cls,obj,"getAttributes","href");
-
+        assertTrue((Boolean) callMethod(cls,obj,"verifyAllLinksAreValid","href"));
     }
 
     @And("user slides upto {int} px")
@@ -217,7 +217,7 @@ public class Steps extends Utils {
 
     @Then("Verify the user lands on modal")
     public void verifyTheUserLandsOnModal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        assertTrue((Boolean) callMethod(cls,obj,"onModal"),"Unable to open modal");
+        assertTrue((String) callMethod(cls,obj,"onModal")!=null,"Unable to open modal");
     }
 
     @Then("Verify that all the tab headings are clickable")
@@ -332,4 +332,25 @@ public class Steps extends Utils {
         assertEquals(globalActualSectionName,globalExpectedSectionName);
 
     }
+
+    @When("user clicks on {string} tab")
+    public void userClicksOnTab(String tabName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        globalExpectedSectionName=tabName;
+        globalActualSectionName= (String) callMethod(cls,obj,"navigateToSectionUsingTabHeading",tabName);
+    }
+
+    @When("clicks on {string} service point under {string} section")
+    public void clicksOnServicePointUnderSection(String servicePointName, String sectionName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        globalServicePointName=servicePointName;
+        callMethod(cls,obj,"navigateToView",sectionName);
+        callMethod(cls, obj, "clickOnServicePoint",servicePointName);
+
+
+    }
+
+    @Then("Verify the user lands on selected service point modal")
+    public void verifyTheUserLandsServicePointModal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        assertTrue(((String) callMethod(cls,obj,"onModal")).equalsIgnoreCase(globalServicePointName));
+    }
+
 }

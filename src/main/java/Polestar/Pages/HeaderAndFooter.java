@@ -12,34 +12,36 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Function;
 
 public class HeaderAndFooter extends commonMethods {
 
     private static Map<String, WebElement> mapping = new HashMap<String, WebElement>();
     private static WebDriver driver;
-    @FindBy(xpath = "//a[@href and @class='css-10wxmov' or @class='css-1asux84']")
-    private List<WebElement> footerLinks;
     @FindBy(xpath = "//a[@href and @class='css-1p608u1' or @class='css-nofjbs' or @class='css-stpt7n']")
     private List<WebElement> headerLinks;
-    @FindBy(xpath = "//a[@href='/us/sign-up-newsletter/?redirect-url=/us/polestar-2/']")
+    @FindBy(css = "a[class='css-1asux84']")
     private WebElement SubscribeBtn;
+    @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
+    private WebElement cookieBar;
     @FindBy(xpath = "//div[text()='United States']")
     private WebElement changeLocation;
     @FindBy(xpath = "//h1[text()='Select your region']")
     private WebElement regionSelect;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
-    @FindBy(xpath = "//button[@class='css-s6oy8']")
+    @FindBy(css = "button[class='css-1y07xyn']>div")
     private WebElement closeBtn;
-    @FindBy(xpath = "//button[@title='menu']")
+    @FindBy(css = "[class='css-1nlu2c6']")
     private WebElement headerMenu;
     @FindBy(xpath = "//a[@href='/us/polestar-1/' and @class='css-1p608u1']")
     private WebElement polestar1Explore;
@@ -51,16 +53,16 @@ public class HeaderAndFooter extends commonMethods {
     private WebElement polestar2Configure;
     @FindBy(xpath = "//a[@href='/us/test-drive/booking/select-location?location-type&model=ps2/'] and @class='css-nofjbs']")
     private WebElement polestar2TestDrive;
-    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-0']")
+    @FindBy(css = "[class='css-yof1vp']>div:nth-child(1)")
     private WebElement polestarDotComFooterMobile;
-    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-1']")
+    @FindBy(css = "[class='css-yof1vp']>div:nth-child(2)")
     private WebElement polestarFooterMobile;
-    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-2']")
+    @FindBy(css = "[class='css-yof1vp']>div:nth-child(3)")
     private WebElement discoverFooterMobile;
-    @FindBy(xpath = "//button[@aria-controls='wusj1esvciq8fo5c-3']")
+    @FindBy(css = "[class='css-yof1vp']>div:nth-child(4)")
     private WebElement socialFooterMobile;
-    @FindBy(how= How.CSS , using= "[class='css-1ee9ltk'] a[href]")
-    private List<WebElement> footerLinks1;
+    @FindBy(how= How.CSS , using= "section[class='css-10n9r42'] a[href]")
+    private List<WebElement> footerLinks;
     private static final Logger LOG = LogManager.getLogger(HeaderAndFooter.class);
 
     public HeaderAndFooter(WebDriver driver) {
@@ -69,19 +71,29 @@ public class HeaderAndFooter extends commonMethods {
         driver.switchTo().defaultContent();
         try {
             try {
-                WebDriverWait wait = new WebDriverWait(driver, 15);
-                wait.until(ExpectedConditions.visibilityOfElementLocated(
-                        (By.xpath("//button[@class='optanon-allow-all accept-cookies-button']"))));
-                wait.until(ExpectedConditions.elementToBeClickable
-                        (acceptCookies));
-                wait.until(ExpectedConditions.visibilityOf(acceptCookies));
+                Wait<WebDriver> waitF = new FluentWait<WebDriver>(driver)
+                        .withTimeout(Duration.ofSeconds(5))
+                        .pollingEvery(Duration.ofSeconds(1))
+                        .ignoring(NoSuchElementException.class);
+                WebElement foo = waitF.until(new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return driver.findElement(By.className("css-113edzk"));
+                    }
+                });
+                ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
+                WebDriverWait wait = new WebDriverWait(driver, 5);
+                wait.until(ExpectedConditions.visibilityOf(cookieBar));
+                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error(e.getMessage());
+                LOG.error(e.getStackTrace().toString());
             }
-            Thread.sleep(2000);
-            clickOnElement(acceptCookies);
+            while (acceptCookies.isDisplayed()){
+                clickOnElementJS(driver,acceptCookies);
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOG.error(e.getMessage());
+            LOG.error(e.getStackTrace().toString());
         }
         mapping.put("SUBSCRIBE", SubscribeBtn);
         mapping.put("CHANGE LOCATION", changeLocation);
@@ -155,19 +167,20 @@ public class HeaderAndFooter extends commonMethods {
 
     }
 
-    public void getAttributes(String attName) throws Exception {
-        System.out.println(footerLinks1.size());
-
-        for(WebElement e: footerLinks1){
-            HttpURLConnection connection = (HttpURLConnection)new URL(e.getAttribute(attName)).openConnection();
-            LOG.info("some text");
-            System.out.println("dgfdg");
-            LOG.info(e.getAttribute(attName));
-            connection.setRequestMethod("HEAD");
-            connection.connect();
-            LOG.info("Error Stream"+connection.getErrorStream());
-            LOG.info("Response Message"+connection.getResponseMessage());
-            LOG.info("Error Stream"+connection.getResponseCode());
-        }
+    public boolean verifyAllLinksAreValid(String attName) throws Exception {
+        System.out.println(footerLinks.size());
+        final boolean[] footerLinksValid = {true};
+        footerLinks.stream().filter(s->!s.getAttribute(attName).contains("https://developer.polestar.com")).forEach(s->{
+            try {
+                HttpURLConnection connection = (HttpURLConnection)new URL(s.getAttribute(attName)).openConnection();
+                connection.setRequestMethod("HEAD");
+                connection.connect();
+                LOG.info(s.getAttribute(attName)+"-"+connection.getResponseCode());
+                footerLinksValid[0] = footerLinksValid[0] && connection.getResponseCode()==(s.getAttribute(attName).contains("instagram")?405:200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        return footerLinksValid[0];
     }
 }

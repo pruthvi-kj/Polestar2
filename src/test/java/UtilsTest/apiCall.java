@@ -1,4 +1,4 @@
-package resources;
+package UtilsTest;
 
 import Polestar.DataMembers.FuelPrices;
 import io.restassured.builder.RequestSpecBuilder;
@@ -37,11 +37,11 @@ public class apiCall {
                 .spec(reqSpec).when().get("eu-north-1/energy-prices").then().spec(responseSpecification).extract().response();
 
         JsonPath js= new JsonPath(response.asString());
-        String date = js.get("data.getFuelById.gasoline.date");
-        String stateCodeResponse = js.get("data.getFuelById.id");
+        String date = js.get("ServicePoints.getFuelById.gasoline.date");
+        String stateCodeResponse = js.get("ServicePoints.getFuelById.id");
 
         if(stateCodeResponse.equalsIgnoreCase(stateCode)){
-            return new FuelPrices(js.get("data.getElectricityById.average"),js.get("data.getFuelById.gasoline.price"));
+            return new FuelPrices(js.get("ServicePoints.getElectricityById.average"),js.get("ServicePoints.getFuelById.gasoline.price"));
         }
         return null;
     }

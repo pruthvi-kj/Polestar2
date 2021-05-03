@@ -10,6 +10,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,7 +95,7 @@ public class commonMethods {
 
     public static void writeToExcel(String path) throws IOException {
         FileOutputStream fos = new FileOutputStream(path);
-        //write data in the excel file
+        //write ServicePoints in the excel file
         workbook.write(fos);
         //close output stream
         fos.close();
@@ -137,14 +139,16 @@ public class commonMethods {
     }
 
     public void scrollToElementUsingActionClass(WebDriver driver, WebElement element) {
+        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(element));
         Actions ac = new Actions(driver);
         ac.moveToElement(element).build().perform();
     }
-    public static WebElement getSectionToNavigate(List<WebElement> sections, String view){
-//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("data-name").equalsIgnoreCase(view)).
+
+    public static WebElement getSectionToNavigate(List<WebElement> sections, String view, String attribute){
+//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("ServicePoints-name").equalsIgnoreCase(view)).
 //                collect(Collectors.toList());
         for(WebElement e: sections){
-            if(e.getAttribute("data-name").equalsIgnoreCase(view)){
+            if(e.getAttribute(attribute).equalsIgnoreCase(view)){
                 return e;
             }
         }

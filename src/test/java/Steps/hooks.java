@@ -1,7 +1,10 @@
 package Steps;
 
+import UtilsTest.Utils;
 import io.cucumber.java.Before;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -10,7 +13,6 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
-import resources.Utils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class hooks extends Utils {
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
     private static RemoteWebDriver driver, desktopDriver, mobileDriver;
+    private static final Logger LOG = LogManager.getLogger(hooks.class);
+
 
     @Before("@Mobile")
     public static void openMobileBrowser() throws IOException {
@@ -27,7 +31,6 @@ public class hooks extends Utils {
             String kobitonServerUrl = getDeviceProperty("kobitonServerUrl");
             String platform;
             platform = (System.getProperty("mobilePlatform") == null) ? "android" : System.getProperty("mobilePlatform");
-            System.out.println(platform);
             switch (platform) {
                 case "android":
                     capabilities.setCapability("browserName", "chrome");
@@ -37,6 +40,10 @@ public class hooks extends Utils {
                     capabilities.setCapability("deviceName", getDeviceProperty("deviceNameAndroid"));
                     capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionAndroid"));
                     capabilities.setCapability("platformName", "Android");
+                    capabilities.setCapability("automationName", "uiautomator2");
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.setExperimentalOption("w3c", true);
+                    capabilities.setCapability("chromeOptions", chromeOptions);
                     break;
 
                 case "ios":
@@ -47,6 +54,7 @@ public class hooks extends Utils {
                     capabilities.setCapability("deviceName", getDeviceProperty("deviceNameIos"));
                     capabilities.setCapability("platformVersion", getDeviceProperty("platformVersionIos"));
                     capabilities.setCapability("platformName", "iOS");
+                    capabilities.setCapability("automationName", "uiautomator2");
                     break;
             }
 
@@ -58,7 +66,12 @@ public class hooks extends Utils {
             // within the group.
             capabilities.setCapability("groupId", 2016); // Group: Team-Polestar
             capabilities.setCapability("deviceGroup", "KOBITON");
-            mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
+            try {
+                mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
+            }catch (Exception e){
+                LOG.error(e);
+                throw e;
+            }
             mobileDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         }
         driver = mobileDriver;
@@ -113,8 +126,13 @@ public class hooks extends Utils {
                     ChromeOptions options = new ChromeOptions();
 //                    options.addArguments("--headless");
 //                    options.addArguments("window-size=1920,1080");
-                    options.addArguments("user-data-dir=target/ChromeData");
-                    desktopDriver = new ChromeDriver(options);
+                    options.addArguments("user-ServicePoints-dir=target/ChromeData");
+                    try {
+                        desktopDriver = new ChromeDriver(options);
+                    }catch (Exception e){
+                        LOG.error(e);
+                        throw e;
+                    }
                     break;
                 case "firefox":
                     WebDriverManager.firefoxdriver().setup();
@@ -122,10 +140,20 @@ public class hooks extends Utils {
                     firefoxBinary.addCommandLineOptions("--headless");
                     FirefoxOptions firefoxOptions = new FirefoxOptions();
                     firefoxOptions.setBinary(firefoxBinary);
-                    desktopDriver = new FirefoxDriver(firefoxOptions);
+                    try {
+                        desktopDriver = new FirefoxDriver(firefoxOptions);
+                    }catch (Exception e){
+                        LOG.error(e);
+                        throw e;
+                    }
                     break;
                 case "safari":
-                    desktopDriver = new SafariDriver();
+                    try {
+                        desktopDriver = new SafariDriver();
+                    }catch (Exception e){
+                        LOG.error(e);
+                        throw e;
+                    }
                     break;
                 //                  *ipad using chrome emulation(to be added if needed)*
 //            case "ipad":
