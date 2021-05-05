@@ -1,4 +1,4 @@
-#Feature: Verify the navigation in Header
+Feature: Verify the navigation in Header
 #
 #  Background: Which paltform and browser to be initilaised
 #    Given User lands on "https://www.polestar.com/us/polestar-2/" page
@@ -74,3 +74,9 @@
 #      | Support | Owners manual                  |
 #      | Legal   | Polestar legal                 |
 #      | Media   | Polestar media newsroom - Home |
+
+#    @Header @Desktop
+#    Scenario: Verify the Header links on Polestar 2 homepage for Hamburger Menu
+#      Given User is in "HeaderAndFooter" page
+#      When user navigates to header
+#      Then verify that all the links are valid

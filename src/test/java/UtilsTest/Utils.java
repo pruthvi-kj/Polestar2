@@ -1,5 +1,6 @@
 package UtilsTest;
 
+import Polestar.DataMembers.FuelPrices;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -18,6 +19,11 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Utils {
+
+    private static final double polestar2EnergyConsumption=0.193;
+    private static final double fuelVehicleEnergyConsumption=0.083;
+    private static final double weeksInYear=52.1775;
+
 
     public static String getDeviceProperty(String key) throws IOException {
         Properties prop = new Properties();
@@ -70,6 +76,11 @@ public class Utils {
         Object o = method.invoke(obj, arg1, arg2);
         return o;
     }
+    public static Object callMethod(Class cls, Object obj, String methodName,int arg1) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = cls.getDeclaredMethod(methodName, int.class);
+        Object o = method.invoke(obj, arg1);
+        return o;
+    }
 
     public static Object callMethod(Class cls, Object obj, String methodName,String arg1, double arg2) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method = cls.getDeclaredMethod(methodName, String.class, double.class);
@@ -104,6 +115,17 @@ public class Utils {
             return cells.next().getStringCellValue();
         }
         return null;
+    }
+
+    public static FuelPrices calculateExpenses(double milesToKM,FuelPrices price){
+        FuelPrices fp= new FuelPrices();
+        fp.yearCostForPolestar2=Math.round((polestar2EnergyConsumption * weeksInYear * milesToKM) * price.electricityPrice);
+        fp.yearCostForFuelCar=Math.round((fuelVehicleEnergyConsumption * weeksInYear * milesToKM) * price.fuelPrice);
+        fp.yearEstimatedFuelSavings= fp.yearCostForFuelCar-fp.yearCostForPolestar2;
+        fp.monthCostForPolestar2=Math.round(((polestar2EnergyConsumption * weeksInYear * milesToKM)/12)*price.electricityPrice);
+        fp.monthCostForFuelCar=Math.round(((fuelVehicleEnergyConsumption * weeksInYear * milesToKM)/12)*price.fuelPrice);
+        fp.monthEstimatedFuelSavings=fp.monthCostForFuelCar-fp.monthCostForPolestar2;
+        return fp;
     }
 
 }

@@ -3,10 +3,7 @@ package Polestar.Pages;
 import Polestar.Utils.commonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
@@ -17,9 +14,8 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -27,7 +23,9 @@ public class HeaderAndFooter extends commonMethods {
 
     private static Map<String, WebElement> mapping = new HashMap<String, WebElement>();
     private static WebDriver driver;
-    @FindBy(xpath = "//a[@href and @class='css-1p608u1' or @class='css-nofjbs' or @class='css-stpt7n']")
+    private static String globalHeaderOrFooter;
+
+    @FindBy(css = ".css-os9k16 [href]")
     private List<WebElement> headerLinks;
     @FindBy(css = "a[class='css-1asux84']")
     private WebElement SubscribeBtn;
@@ -63,7 +61,10 @@ public class HeaderAndFooter extends commonMethods {
     private WebElement socialFooterMobile;
     @FindBy(how= How.CSS , using= "section[class='css-10n9r42'] a[href]")
     private List<WebElement> footerLinks;
+    @FindBy(css = ".css-hqh0g2 [href]")
+    private List<WebElement> headerLinksSubmenuItems;
     private static final Logger LOG = LogManager.getLogger(HeaderAndFooter.class);
+
 
     public HeaderAndFooter(WebDriver driver) {
         this.driver = driver;
@@ -115,6 +116,7 @@ public class HeaderAndFooter extends commonMethods {
         ((JavascriptExecutor) driver)
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");
         Thread.sleep(1000);
+        globalHeaderOrFooter="footer";
     }
 
     public boolean isElementVisible(String userPageTitle) {
@@ -136,6 +138,7 @@ public class HeaderAndFooter extends commonMethods {
                     ((JavascriptExecutor) driver)
                             .executeScript("window.scrollTo(0,0)");
                     clickOnElement(headerMenu);
+                    globalHeaderOrFooter="header";
                     break;
                 default:
                     Iterator<WebElement> h = headerLinks.iterator();
@@ -162,25 +165,42 @@ public class HeaderAndFooter extends commonMethods {
         try {
             action.moveToElement(menuElement).build().perform();
         } catch (Exception e) {
+            LOG.error(e);
             throw e;
         }
 
     }
 
-    public boolean verifyAllLinksAreValid(String attName) throws Exception {
-        System.out.println(footerLinks.size());
-        final boolean[] footerLinksValid = {true};
+    public boolean verifyAllLinksAreValid() throws Exception {
+        final boolean[] linksValid = {true};
+        String attName="href";
+        if(globalHeaderOrFooter.contains("footer")){
         footerLinks.stream().filter(s->!s.getAttribute(attName).contains("https://developer.polestar.com")).forEach(s->{
             try {
-                HttpURLConnection connection = (HttpURLConnection)new URL(s.getAttribute(attName)).openConnection();
-                connection.setRequestMethod("HEAD");
-                connection.connect();
-                LOG.info(s.getAttribute(attName)+"-"+connection.getResponseCode());
-                footerLinksValid[0] = footerLinksValid[0] && connection.getResponseCode()==(s.getAttribute(attName).contains("instagram")?405:200);
+                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
             } catch (IOException e) {
+                LOG.error(e);
+                e.printStackTrace();
+            }
+        }); }
+        else {
+        headerLinks.stream().forEach(s-> {
+            try {
+                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
+            } catch (IOException e) {
+                LOG.error(e);
                 e.printStackTrace();
             }
         });
-        return footerLinksValid[0];
+        headerLinks.stream().filter(s->s.getAttribute("href").contains("polestar-2")||s.getAttribute("href").contains("polestar-1"))
+                .forEach(s->{ new Actions(driver).moveToElement(s).build().perform();
+                    headerLinksSubmenuItems.stream().forEach(p->{
+                        try {
+                            linksValid[0] = linksValid[0] && makeUrlConnection(p)==(p.getAttribute(attName).contains("instagram")?405:200);
+                        } catch (Exception e) {
+                        }
+                    });
+                });}
+        return linksValid[0];
     }
 }

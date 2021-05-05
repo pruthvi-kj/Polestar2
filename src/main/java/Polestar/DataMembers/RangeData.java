@@ -10,4 +10,5 @@ public class RangeData {
             this.rangePercentage=percentage;
             this.miles=miles;
         }
+        public RangeData(){}
 }

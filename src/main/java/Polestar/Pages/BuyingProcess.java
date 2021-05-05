@@ -17,42 +17,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceAndAssistance extends commonMethods {
-    private static RemoteWebDriver driver;
-    private static final Logger LOG = LogManager.getLogger(ServiceAndAssistance.class);
+public class BuyingProcess extends commonMethods {
+    private static final Logger LOG = LogManager.getLogger(BuyingProcess.class);
+    private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
+    private static final String spacesListSection = "css-1nfgff6";
     public static WebElement temp;
-    Map<String, WebElement> mapping = new HashMap<>();
-
-    private static final String learnOrSeeMoreCta ="div[class='css-ly8tcg']";
-    private static final String servicePointsListSection="css-1nb4a83";
-
+    private static RemoteWebDriver driver;
     private static TestReport testReport;
 
-
+    Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
     private WebElement cookieBar;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
     @FindBy(css = "div[class='css-13j3osp']")
     private WebElement tabHeadingView;
-    @FindBy(className = "css-1xuj1yo")
-    private WebElement closeCTA;
     @FindBy(className = "css-d29to2")
     private List<WebElement> tabHeadings;
     @FindBy(css = ".css-13j3osp button[class='css-47lmvx']>span")
     private WebElement sectionNavigatedTo;
     @FindBy(css = "[data-name]")
     private List<WebElement> sections;
-    @FindBy(className="css-t8cify")
+    @FindBy(className = "css-t8cify")
     private WebElement modalOpen;
-    @FindBy(className="css-5x9gvo")
-    private List<WebElement> servicePoints;
+    @FindBy(className = "css-1qbfuld")
+    private List<WebElement> spaces;
     @FindBy(css = "[class='css-yp9swi'] [href]")
-    private List<WebElement> serviceAndAssistanceLinks;
+    private List<WebElement> buyingProcessLinks;
+    @FindBy(className = "css-1xuj1yo")
+    private WebElement closeCTA;
 
-    public ServiceAndAssistance(WebDriver driver) throws InterruptedException {
+    public BuyingProcess(WebDriver driver) throws InterruptedException {
 
-        this.driver = (RemoteWebDriver) driver;
+        this.driver = (RemoteWebDriver)driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
@@ -67,19 +64,18 @@ public class ServiceAndAssistance extends commonMethods {
         while (acceptCookies.isDisplayed())
             clickOnElementJS(driver, acceptCookies);
         mapping.put("TAB HEADINGS", tabHeadingView);
-        testReport = TestInitialization.getInstance();
-
+        testReport= TestInitialization.getInstance();
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        temp=mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()):getSectionToNavigate(sections,view,"data-name");
-        navigateUsingJSToAnElementStart(driver,temp);
+        temp = mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()) : getSectionToNavigate(sections, view, "data-name");
+        navigateUsingJSToAnElementStart(driver, temp);
     }
 
     public String navigateToSectionUsingTabHeading(String view) throws InterruptedException {
         new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
-        clickOnElementJS(driver,getSectionToNavigate(tabHeadings,view,"title"));
-        new WebDriverWait(driver,3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo,view));
+        clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
+        new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
         testReport.log("User is in section"+view);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
@@ -89,12 +85,12 @@ public class ServiceAndAssistance extends commonMethods {
         clickOnElement(temp.findElement(By.cssSelector(learnOrSeeMoreCta)));
     }
 
-    public String clickOnServicePoint(String servicePointName) throws InterruptedException {
+    public String clickOnSpace(String spaceName) throws InterruptedException {
         final String[] modalHeading = new String[1];
-        navigateUsingJSToAnElementEnd(driver,temp.findElement(By.className(servicePointsListSection)));
+        navigateUsingJSToAnElementEnd(driver,temp.findElement(By.className(spacesListSection)));
         testReport.log("User is in service point section");
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-        servicePoints.stream().filter(s->s.getText().equalsIgnoreCase(servicePointName)).forEach(s->{
+        spaces.stream().filter(s->s.getText().equalsIgnoreCase(spaceName)).forEach(s->{
             new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
             clickOnElementJS(driver,s);
             try {
@@ -102,7 +98,7 @@ public class ServiceAndAssistance extends commonMethods {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            testReport.log("User is in Service Point modal of "+servicePointName);
+            testReport.log("User is in Service Point modal of "+spaceName);
             testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
@@ -110,14 +106,14 @@ public class ServiceAndAssistance extends commonMethods {
         return modalHeading[0];
     }
 
-    public String onModal(){
+    public String onModal() {
         return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
     }
 
     public boolean verifyAllLinksAreValid() throws Exception {
         final boolean[] linksValid = {true};
         String attName = "href";
-        serviceAndAssistanceLinks.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
+        buyingProcessLinks.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
                 !s.getAttribute(attName).toLowerCase().contains("tel")).forEach(s -> {
             try {
                 linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
@@ -128,6 +124,5 @@ public class ServiceAndAssistance extends commonMethods {
         });
         return linksValid[0];
     }
-
-
 }
+

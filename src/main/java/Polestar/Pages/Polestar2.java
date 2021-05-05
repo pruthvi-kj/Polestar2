@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -31,7 +32,7 @@ public class Polestar2 extends commonMethods{
     private static final Logger LOG = LogManager.getLogger(Polestar2.class);
 
     private static XSSFSheet sheet;
-    private static WebDriver driver;
+    private static RemoteWebDriver driver;
 
     private static final String sliderComponent="[class='css-1nqf9b0']";
     private static final String startEndSliderId="[class='css-1nqf9b0']>div>div";
@@ -42,7 +43,7 @@ public class Polestar2 extends commonMethods{
     private static final String estimatedChargeTime ="css-15bk8jn";
     private static final String startEndChangePercentage ="css-yv1aru";
     private static final String chargingSliderComponent ="[class='css-9lvjku']";
-    private static final String chargerTypeId ="[ServicePoints-testid]";
+    private static final String chargerTypeId ="[data-testid]";
     private static final String chargerTypeIdText ="div:nth-child(2)>p:nth-child(1)";
     private static final String learnOrSeeMoreCta ="div[class='css-ly8tcg']";
 
@@ -64,11 +65,13 @@ public class Polestar2 extends commonMethods{
     private WebElement seeMoreLEDLights;
     @FindBy(className = "css-138i4qw")
     private WebElement exteriorView;
+    @FindBy(className = "css-1sb6ikf")
+    private WebElement closeCTA;
     @FindBy(className = "css-j07xvw")
     private WebElement orderNowCta;
     @FindBy(className = "css-zgmw7k")
     private WebElement heroUnit;
-    @FindBy(className = "css-1bs17j1")
+    @FindBy(className = "css-azo2pw")
     private WebElement bookATestDriveHU;
     @FindBy(css ="[class='css-1k4t3n2']>div:nth-child(3)")
     private WebElement rangeSlider;
@@ -100,19 +103,23 @@ public class Polestar2 extends commonMethods{
     private WebElement stateNameId;
     @FindBy(className = "css-18rtpmq")
     private WebElement stateSelectionClearBtn;
-    @FindBy(className = "css-1knqvy9")
+    @FindBy(className = "css-147hag1")
     private List<WebElement> navBarIds;
-    @FindBy(className = "css-1c1kduu")
+    @FindBy(className = "css-113edzk")
     private WebElement navBar;
     @FindBy(className = "css-1gprnpu")
     private WebElement selectedNavBar;
-    //time="div[ServicePoints-name='Home charging'] [class='css-15bk8jn']"
+    @FindBy(css = ".css-u6if8s>button")
+    private List<WebElement> selectedTabBar;
+    @FindBy(css = "[class='css-yp9swi'] [href]")
+    private List<WebElement> polestar2Links;
+    //time="div[data-name='Home charging'] [class='css-15bk8jn']"
     private static TestReport testReport;
     private static WebElement temp;
 
 
     public Polestar2(WebDriver driver) throws InterruptedException  {
-        this.driver = driver;
+        this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
@@ -121,7 +128,7 @@ public class Polestar2 extends commonMethods{
                         .withTimeout(Duration.ofSeconds(5))
                         .pollingEvery(Duration.ofSeconds(1))
                         .ignoring(NoSuchElementException.class);
-                WebElement foo = waitF.until(new Function<WebDriver, WebElement>() {
+                waitF.until(new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
                         return driver.findElement(By.className("css-113edzk"));
                     }
@@ -160,17 +167,15 @@ public class Polestar2 extends commonMethods{
         int getWidth=temp.findElement(By.cssSelector(sliderComponent)).getRect().getWidth();
         List<WebElement> slider=temp.findElements(By.cssSelector(startEndSliderId));
         Actions a= new Actions(driver);
-        if((endChargePercentage <= getWidth) && (startChargePercentage < endChargePercentage)){
-            a.moveToElement(slider.get(0),startChargePercentage,0).click().build().perform();
-            a.moveToElement(slider.get(1),endChargePercentage,0).click().build().perform();
-        }
+        a.moveToElement(slider.get(0),startChargePercentage,0).click().build().perform();
+        a.moveToElement(slider.get(1),endChargePercentage,0).click().build().perform();
         Thread.sleep(1000);
     }
 
     public FuelPrices getSavingsValue(String chargingSectionName) throws InterruptedException {
         Thread.sleep(3000);
         List<Long> values= new ArrayList<>();
-        temp= getSectionToNavigate(chargingModalSections,chargingSectionName,"ServicePoints-name").findElement(By.cssSelector(savingsValueComponent));
+        temp= getSectionToNavigate(chargingModalSections,chargingSectionName,"data-name").findElement(By.cssSelector(savingsValueComponent));
         temp.findElements(By.className(yearMonthSelector)).stream().forEach(s-> {
             try {
                 Thread.sleep(1000);
@@ -180,9 +185,9 @@ public class Polestar2 extends commonMethods{
             temp.findElements(By.cssSelector(costForMiles)).stream().forEach(p->{
                 scrollToElementUsingActionClass(driver,p);
                 values.add(Long.parseLong(p.getText().split(" ")[1]));
-                values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().split(" ")[1]));
-                clickOnElement(s);
                     });
+            values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().split(" ")[1]));
+            clickOnElement(s);
         });
 
         return new FuelPrices(values.get(0),values.get(1),values.get(2),values.get(3),values.get(4),values.get(5));
@@ -201,7 +206,7 @@ public class Polestar2 extends commonMethods{
 
         public void clickOnChargerType(String chargingSectionName,double chargerType) throws InterruptedException {
         temp= getSectionToNavigate(chargingModalSections,chargingSectionName,"data-name");
-        navigateUsingJSToAnElement(driver,temp.findElement(By.cssSelector(chargingSliderComponent)));
+            navigateUsingJSToAnElementEnd(driver,temp.findElement(By.cssSelector(chargingSliderComponent)));
         temp.findElements(By.cssSelector(chargerTypeId)).stream()
                 .filter(s->s.findElement(By.cssSelector(chargerTypeIdText)).getText()
                         .contains(Double.toString(chargerType))).forEach(s-> clickOnElementJS(driver,s));
@@ -221,17 +226,13 @@ public class Polestar2 extends commonMethods{
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        Wait<WebDriver> wait = new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(15))
+        Wait<RemoteWebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofSeconds(1))
                 .ignoring(NoSuchElementException.class);
-        WebElement foo = wait.until(new Function<WebDriver, WebElement>() {
-            public WebElement apply(WebDriver driver) {
-                return sections.get(10);
-            }
-        });
+        wait.until((Function<WebDriver, WebElement>) driver -> sections.get(10));
         temp=getSectionToNavigate(sections,view,"data-name");
-        navigateUsingJSToAnElement(driver,temp);
+        navigateUsingJSToAnElementStart(driver,temp);
     }
 
     public String getViewName(String view) {
@@ -246,7 +247,7 @@ public class Polestar2 extends commonMethods{
     public void extractDataOfElements() throws IOException {
         Iterator<Row> rows = sheet.iterator();
         Row firstRow = rows.next();
-        //getting the index for writing ServicePoints
+        //getting the index for writing data
         int textIndex = getColumnIndex(firstRow, "Actual Text");
         int fontIndex = getColumnIndex(firstRow, "Actual Font Family");
         int colourIndex = getColumnIndex(firstRow, "Actual Font Colour");
@@ -286,7 +287,7 @@ public class Polestar2 extends commonMethods{
         Iterator<Row> rows = sheet.iterator();
         Row firstRow = rows.next();
         int index = getColumnIndex(firstRow, "Callouts");
-        //read ServicePoints from excel and put it in an array list
+        //read data from excel and put it in an array list
 
         while (rows.hasNext()) {
             Row r = rows.next();
@@ -299,10 +300,10 @@ public class Polestar2 extends commonMethods{
     public ArrayList<String> getTextOfElements(String section) {
         ArrayList<String> calloutActual = new ArrayList<>();
         List<WebElement> elementToVerify;
-        //read ServicePoints from UI and put it in an array list
+        //read data from UI and put it in an array list
         try {
             elementToVerify = driver.findElements(By.xpath("//p[text()='" +
-                    section + "']/../..//p[@ServicePoints-testid]"));
+                    section + "']/../..//p[@data-testid]"));
         } catch (Exception e) {
             LOG.error(e.getStackTrace());
             throw e;
@@ -314,22 +315,24 @@ public class Polestar2 extends commonMethods{
         return calloutActual;
     }
 
-    public void updateSliderPosition(String slideX) throws InterruptedException {
+    public void updateSliderPosition(int slideX) throws InterruptedException {
         Actions a= new Actions(driver);
-        navigateUsingJSToAnElement(driver,rangeCalcComp);
+        navigateUsingJSToAnElementEnd(driver,rangeCalcComp);
         int width= range.getRect().getWidth();
-        if(Integer.parseInt(slideX)<=width){
-        a.clickAndHold(rangeSlider).dragAndDropBy(rangeSlider,Integer.parseInt(slideX),0).build().perform();}
-        Thread.sleep(1000);
+        if(slideX<=width){
+        a.clickAndHold(rangeSlider).dragAndDropBy(rangeSlider,slideX,0).build().perform();}
     }
 
     public RangeData calculateMiles(){
+        testReport.log("screenshot for "+rangeMiles.getText()+" miles");
+        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return new RangeData(Integer.parseInt(rangeCharge.getText()),Integer.parseInt(rangeChargePercentage.getText()),
                 Integer.parseInt(rangeMiles.getText()));
-
     }
 
     public String onModal(){
+        new WebDriverWait(driver,3).until(ExpectedConditions.elementToBeClickable(closeCTA));
+        clickOnElement(closeCTA);
         return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
     }
 
@@ -338,6 +341,11 @@ public class Polestar2 extends commonMethods{
             try {
                 new WebDriverWait(driver, 2).until(ExpectedConditions.elementToBeClickable(modalSections.get(i)));
                 modalSections.get(i).click();
+                System.out.println(modalSections.get(i).getAttribute("textContent")+"section");
+                int finalI = i;
+                selectedTabBar.stream().filter(s-> s.findElement(By.cssSelector("span")).getAttribute("textContent")
+                        .equalsIgnoreCase(modalSections.get(finalI).getAttribute("textContent"))).forEach(s->
+                        new WebDriverWait(driver,3).until(ExpectedConditions.attributeContains(s,"aria-selected","true")));
             }
             catch (Exception e){
                 return false;
@@ -353,12 +361,27 @@ public class Polestar2 extends commonMethods{
     }
 
     public String navigateToSectionUsingNavBar(String sectionName) throws InterruptedException {
-        navBarIds.stream().filter(s-> s.getAttribute("ServicePoints-label").equalsIgnoreCase(sectionName)).forEach(s->{
+        navBarIds.stream().filter(s-> s.getAttribute("data-label").equalsIgnoreCase(sectionName)).forEach(s->{
             new Actions(driver).moveToElement(navBar).build().perform();
             new Actions(driver).moveToElement(s).click().build().perform();
         });
         Thread.sleep(2000);
         return selectedNavBar.getText();
+    }
+
+    public boolean verifyAllLinksAreValid() throws Exception {
+        final boolean[] linksValid = {true};
+        String attName = "href";
+        polestar2Links.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
+                !s.getAttribute(attName).toLowerCase().contains("tel")).forEach(s -> {
+            try {
+                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
+            } catch (IOException e) {
+                LOG.error(e);
+                e.printStackTrace();
+            }
+        });
+        return linksValid[0];
     }
 }
 

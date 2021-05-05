@@ -1,5 +1,8 @@
 package Polestar.Utils;
 
+import Polestar.Pages.Polestar2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,6 +19,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +29,10 @@ public class commonMethods {
     private static XSSFWorkbook workbook;
     private static XSSFSheet sheet;
     private static FileInputStream fis;
+    private static final Logger LOG = LogManager.getLogger(Polestar2.class);
+    private static WebDriver driver;
+
+
 
     public static void clickOnElement(WebElement element) {
         try {
@@ -95,7 +104,7 @@ public class commonMethods {
 
     public static void writeToExcel(String path) throws IOException {
         FileOutputStream fos = new FileOutputStream(path);
-        //write ServicePoints in the excel file
+        //write data in the excel file
         workbook.write(fos);
         //close output stream
         fos.close();
@@ -132,7 +141,13 @@ public class commonMethods {
         r.createCell(index).setCellValue(text);
     }
 
-    public void navigateUsingJSToAnElement(WebDriver driver, WebElement element) throws InterruptedException {
+    public void navigateUsingJSToAnElementEnd(WebDriver driver, WebElement element) throws InterruptedException {
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView(false);", element);
+        Thread.sleep(1000);
+    }
+
+    public void navigateUsingJSToAnElementStart(WebDriver driver, WebElement element) throws InterruptedException {
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView(true);", element);
         Thread.sleep(1000);
@@ -145,7 +160,7 @@ public class commonMethods {
     }
 
     public static WebElement getSectionToNavigate(List<WebElement> sections, String view, String attribute){
-//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("ServicePoints-name").equalsIgnoreCase(view)).
+//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("data-name").equalsIgnoreCase(view)).
 //                collect(Collectors.toList());
         for(WebElement e: sections){
             if(e.getAttribute(attribute).equalsIgnoreCase(view)){
@@ -153,6 +168,16 @@ public class commonMethods {
             }
         }
          return null;
+    }
+
+    public static int makeUrlConnection(WebElement element) throws IOException {
+        String attName= "href";
+        HttpURLConnection connection = (HttpURLConnection)new URL(element.getAttribute(attName)).openConnection();
+        connection.setRequestMethod("HEAD");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        connection.connect();
+        LOG.info("CTA- "+element.getAttribute("textContent")+", URL- "+element.getAttribute(attName) + ", Response Code- " + connection.getResponseCode()+connection.getResponseMessage());
+        return connection.getResponseCode();
     }
 
 }
