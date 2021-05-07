@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 
@@ -77,10 +78,10 @@ public class Polestar2 extends commonMethods{
     private WebElement rangeSlider;
     @FindBy(css="[class='css-1k4t3n2']>div:nth-child(3) span[class='css-yv1aru']")
     private WebElement rangeChargePercentage;
-    @FindBy(css="[class='css-1k4t3n2']>div:nth-child(3) p[class='css-1algwbp']")
-    private WebElement rangeMiles;
     @FindBy(css="[class='css-1k4t3n2']>div:nth-child(3) div[class='css-aaonyv']>span[class='css-1algwbp']")
     private WebElement rangeCharge;
+    @FindBy(css="[class='css-1k4t3n2']>div:nth-child(3) p[class='css-1algwbp']")
+    private WebElement rangeMiles;
     @FindBy(className = "css-bchlgi")
     private WebElement rangeCalcComp;
     @FindBy(className = "css-1k4t3n2")
@@ -331,9 +332,10 @@ public class Polestar2 extends commonMethods{
     }
 
     public String onModal(){
+        String modalName=new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
         new WebDriverWait(driver,3).until(ExpectedConditions.elementToBeClickable(closeCTA));
         clickOnElement(closeCTA);
-        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
+        return modalName;
     }
 
     public boolean ifSectionClickable(){
@@ -370,18 +372,19 @@ public class Polestar2 extends commonMethods{
     }
 
     public boolean verifyAllLinksAreValid() throws Exception {
-        final boolean[] linksValid = {true};
+        AtomicBoolean linksValid= new AtomicBoolean();
+        linksValid.set(true);
         String attName = "href";
         polestar2Links.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
                 !s.getAttribute(attName).toLowerCase().contains("tel")).forEach(s -> {
             try {
-                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
+                linksValid.set(linksValid.get() && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200));
             } catch (IOException e) {
                 LOG.error(e);
                 e.printStackTrace();
             }
         });
-        return linksValid[0];
+        return linksValid.get();
     }
 }
 

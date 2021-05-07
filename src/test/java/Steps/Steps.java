@@ -498,9 +498,7 @@ public class Steps extends Utils {
 
     @Given("some shit")
     public void someShit() {
-        String str = "18:22";
-        LocalTime time = LocalTime.parse(str);
-        System.out.println(time);
+
     }
 
     @And("user slides upto {int} px")

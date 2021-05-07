@@ -34,7 +34,8 @@ public class Utils {
 
     public static String getURL(String key) throws IOException {
         Properties prop = new Properties();
-        String readEnv=(System.getProperty("environment")==null?"PROD":System.getProperty("environment")).toUpperCase();
+        String readEnv=(System.getProperty("environment") ==null?"PROD":
+                System.getProperty("environment")).toUpperCase();
         FileInputStream fis = new FileInputStream("src/test/resources/"+readEnv+".properties");
         prop.load(fis);
         return prop.getProperty(key);
