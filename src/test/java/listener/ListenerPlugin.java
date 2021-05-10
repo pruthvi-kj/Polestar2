@@ -6,7 +6,6 @@ import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import utils.TestInitialization;
 import utils.TestReport;
@@ -24,7 +23,7 @@ public class ListenerPlugin implements ConcurrentEventListener {
     public void onTestRunStarted(TestRunStarted testRunStarted) {
         TestInitialization.init();
         System.out.flush();
-        LOG.info(String.format("Test run started at: %s", LocalDateTime.now().toString()));
+        LOG.info(String.format("Test run started at: %s", LocalDateTime.now()));
     }
 
     public void onTestCaseStarted(TestCaseStarted testCaseStarted) {
@@ -47,10 +46,10 @@ public class ListenerPlugin implements ConcurrentEventListener {
         List<String> tags = testStepFinished.getTestCase().getTags();
 
         RemoteWebDriver driver = (RemoteWebDriver) hooks.getDriver();
-        if (driver != null && driver.getSessionId() != null) {
-            testReport.log(testStepFinished.getTestStep().getCodeLocation());
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-        }
+//        if (driver != null && driver.getSessionId() != null) {
+//            testReport.log(testStepFinished.getTestStep().getCodeLocation());
+//            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+//        }
     }
 
     public void onPassedTest(TestCaseFinished testCaseFinished) {

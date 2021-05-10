@@ -26,12 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class commonMethods {
+    private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static XSSFWorkbook workbook;
     private static XSSFSheet sheet;
     private static FileInputStream fis;
-    private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static WebDriver driver;
-
 
 
     public static void clickOnElement(WebElement element) {
@@ -42,8 +41,7 @@ public class commonMethods {
         }
     }
 
-    public static void clickOnElementJS(WebDriver driver, WebElement element)
-    {
+    public static void clickOnElementJS(WebDriver driver, WebElement element) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
 
     }
@@ -122,6 +120,27 @@ public class commonMethods {
         return null;
     }
 
+    public static WebElement getSectionToNavigate(List<WebElement> sections, String view, String attribute) {
+//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("data-name").equalsIgnoreCase(view)).
+//                collect(Collectors.toList());
+        for (WebElement e : sections) {
+            if (e.getAttribute(attribute).equalsIgnoreCase(view)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public static int makeUrlConnection(WebElement element) throws IOException {
+        String attName = "href";
+        HttpURLConnection connection = (HttpURLConnection) new URL(element.getAttribute(attName)).openConnection();
+        connection.setRequestMethod("HEAD");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        connection.connect();
+        LOG.info("CTA- " + element.getAttribute("textContent") + ", URL- " + element.getAttribute(attName) + ", Response Code- " + connection.getResponseCode() + connection.getResponseMessage());
+        return connection.getResponseCode();
+    }
+
     public int getColumnIndex(Row firstRow, String a) {
         Iterator<Cell> cell = firstRow.cellIterator();
         int k = 0;
@@ -154,30 +173,9 @@ public class commonMethods {
     }
 
     public void scrollToElementUsingActionClass(WebDriver driver, WebElement element) {
-        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(element));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(element));
         Actions ac = new Actions(driver);
         ac.moveToElement(element).build().perform();
-    }
-
-    public static WebElement getSectionToNavigate(List<WebElement> sections, String view, String attribute){
-//        List<WebElement>e= sections.stream().filter(s-> s.getAttribute("data-name").equalsIgnoreCase(view)).
-//                collect(Collectors.toList());
-        for(WebElement e: sections){
-            if(e.getAttribute(attribute).equalsIgnoreCase(view)){
-                return e;
-            }
-        }
-         return null;
-    }
-
-    public static int makeUrlConnection(WebElement element) throws IOException {
-        String attName= "href";
-        HttpURLConnection connection = (HttpURLConnection)new URL(element.getAttribute(attName)).openConnection();
-        connection.setRequestMethod("HEAD");
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
-        connection.connect();
-        LOG.info("CTA- "+element.getAttribute("textContent")+", URL- "+element.getAttribute(attName) + ", Response Code- " + connection.getResponseCode()+connection.getResponseMessage());
-        return connection.getResponseCode();
     }
 
 }

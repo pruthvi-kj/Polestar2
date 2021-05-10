@@ -18,17 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 public class ServiceAndAssistance extends commonMethods {
-    private static RemoteWebDriver driver;
     private static final Logger LOG = LogManager.getLogger(ServiceAndAssistance.class);
+    private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
+    private static final String servicePointsListSection = "css-1nb4a83";
     public static WebElement temp;
-    Map<String, WebElement> mapping = new HashMap<>();
-
-    private static final String learnOrSeeMoreCta ="div[class='css-ly8tcg']";
-    private static final String servicePointsListSection="css-1nb4a83";
-
+    private static RemoteWebDriver driver;
     private static TestReport testReport;
-
-
+    Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
     private WebElement cookieBar;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
@@ -43,9 +39,9 @@ public class ServiceAndAssistance extends commonMethods {
     private WebElement sectionNavigatedTo;
     @FindBy(css = "[data-name]")
     private List<WebElement> sections;
-    @FindBy(className="css-t8cify")
+    @FindBy(className = "css-t8cify")
     private WebElement modalOpen;
-    @FindBy(className="css-5x9gvo")
+    @FindBy(className = "css-5x9gvo")
     private List<WebElement> servicePoints;
     @FindBy(css = "[class='css-yp9swi'] [href]")
     private List<WebElement> serviceAndAssistanceLinks;
@@ -72,37 +68,45 @@ public class ServiceAndAssistance extends commonMethods {
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        temp=mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()):getSectionToNavigate(sections,view,"data-name");
-        navigateUsingJSToAnElementStart(driver,temp);
+        try{
+            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);}
+        catch (Exception e){}
+        temp = mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()) : getSectionToNavigate(sections, view, "data-name");
+        navigateUsingJSToAnElementStart(driver, temp);
     }
 
-    public String navigateToSectionUsingTabHeading(String view) throws InterruptedException {
-        new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
-        clickOnElementJS(driver,getSectionToNavigate(tabHeadings,view,"title"));
-        new WebDriverWait(driver,3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo,view));
-        testReport.log("User is in section"+view);
+    public String navigateToSectionUsingTabHeading(String view) {
+        new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
+        clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
+        new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
+        testReport.log("User is in section" + view);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
-    public void clickOnLearnMore() throws InterruptedException {
+    public void clickOnLearnMore() {
         clickOnElement(temp.findElement(By.cssSelector(learnOrSeeMoreCta)));
     }
 
     public String clickOnServicePoint(String servicePointName) throws InterruptedException {
+        try{
+            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);}
+        catch (Exception e){}
         final String[] modalHeading = new String[1];
-        navigateUsingJSToAnElementEnd(driver,temp.findElement(By.className(servicePointsListSection)));
+        navigateUsingJSToAnElementEnd(driver, temp.findElement(By.className(servicePointsListSection)));
         testReport.log("User is in service point section");
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-        servicePoints.stream().filter(s->s.getText().equalsIgnoreCase(servicePointName)).forEach(s->{
-            new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
-            clickOnElementJS(driver,s);
+        servicePoints.stream().filter(s -> s.getText().equalsIgnoreCase(servicePointName)).forEach(s -> {
+            new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
+            clickOnElementJS(driver, s);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            testReport.log("User is in Service Point modal of "+servicePointName);
+            testReport.log("User is in Service Point modal of " + servicePointName);
             testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
@@ -110,17 +114,17 @@ public class ServiceAndAssistance extends commonMethods {
         return modalHeading[0];
     }
 
-    public String onModal(){
+    public String onModal() {
         return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
     }
 
-    public boolean verifyAllLinksAreValid() throws Exception {
+    public boolean verifyAllLinksAreValid() {
         final boolean[] linksValid = {true};
         String attName = "href";
         serviceAndAssistanceLinks.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
                 !s.getAttribute(attName).toLowerCase().contains("tel")).forEach(s -> {
             try {
-                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
+                linksValid[0] = linksValid[0] && makeUrlConnection(s) == (s.getAttribute(attName).contains("instagram") ? 405 : 200);
             } catch (IOException e) {
                 LOG.error(e);
                 e.printStackTrace();

@@ -1,6 +1,13 @@
 package utils.ServicePointsPojo;
 
 public class IndividualServicePoints {
+    private String name;
+    private String slug;
+    private String address;
+    private String googlePlaceId;
+    private boolean useMondayFirst;
+    private String __typename;
+
     public String getName() {
         return name;
     }
@@ -48,15 +55,6 @@ public class IndividualServicePoints {
     public void set__typename(String __typename) {
         this.__typename = __typename;
     }
-
-    private String name;
-    private String slug;
-    private String address;
-    private String googlePlaceId;
-    private boolean useMondayFirst;
-    private String __typename;
-
-
 
 
 }

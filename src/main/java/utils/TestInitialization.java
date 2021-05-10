@@ -5,9 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 
 public class TestInitialization {
-    private static TestReport testReport;
-
     private static final Logger LOG = LogManager.getLogger(TestInitialization.class);
+    private static TestReport testReport;
     private static boolean isInit;
 
     static {
@@ -26,7 +25,8 @@ public class TestInitialization {
             isInit = true;
         }
     }
-    public static TestReport getInstance(){
+
+    public static TestReport getInstance() {
         return testReport;
     }
 

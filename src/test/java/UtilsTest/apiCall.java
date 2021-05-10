@@ -34,15 +34,15 @@ public class apiCall {
 
         ResponseSpecification responseSpecification = new ResponseSpecBuilder().expectStatusCode(200).build();
 
-        response = given().queryParam("variables", "{\"fuelId\":\""+stateCode+"\",\"electricityId\":\"US\"}")
+        response = given().queryParam("variables", "{\"fuelId\":\"" + stateCode + "\",\"electricityId\":\"US\"}")
                 .spec(reqSpec).when().get("eu-north-1/energy-prices").then().spec(responseSpecification).extract().response();
 
-        JsonPath js= new JsonPath(response.asString());
+        JsonPath js = new JsonPath(response.asString());
         String date = js.get("data.getFuelById.gasoline.date");
         String stateCodeResponse = js.get("data.getFuelById.id");
 
-        if(stateCodeResponse.equalsIgnoreCase(stateCode)){
-            return new FuelPrices(js.get("data.getElectricityById.average"),js.get("data.getFuelById.gasoline.price"));
+        if (stateCodeResponse.equalsIgnoreCase(stateCode)) {
+            return new FuelPrices(js.get("data.getElectricityById.average"), js.get("data.getFuelById.gasoline.price"));
         }
         return null;
     }

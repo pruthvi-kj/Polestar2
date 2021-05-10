@@ -47,9 +47,9 @@ public class BuyingProcess extends commonMethods {
     @FindBy(className = "css-1xuj1yo")
     private WebElement closeCTA;
 
-    public BuyingProcess(WebDriver driver) throws InterruptedException {
+    public BuyingProcess(WebDriver driver) {
 
-        this.driver = (RemoteWebDriver)driver;
+        this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
@@ -59,46 +59,54 @@ public class BuyingProcess extends commonMethods {
             wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            LOG.error(e.getStackTrace().toString());
+            LOG.error(e.getStackTrace());
         }
         while (acceptCookies.isDisplayed())
             clickOnElementJS(driver, acceptCookies);
         mapping.put("TAB HEADINGS", tabHeadingView);
-        testReport= TestInitialization.getInstance();
+        testReport = TestInitialization.getInstance();
     }
 
     public void navigateToView(String view) throws InterruptedException {
+        try{
+            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);}
+        catch (Exception e){}
         temp = mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()) : getSectionToNavigate(sections, view, "data-name");
         navigateUsingJSToAnElementStart(driver, temp);
     }
 
-    public String navigateToSectionUsingTabHeading(String view) throws InterruptedException {
-        new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
+    public String navigateToSectionUsingTabHeading(String view) {
+        new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
         new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
-        testReport.log("User is in section"+view);
+        testReport.log("User is in section" + view);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
-    public void clickOnLearnMore() throws InterruptedException {
+    public void clickOnLearnMore() {
         clickOnElement(temp.findElement(By.cssSelector(learnOrSeeMoreCta)));
     }
 
     public String clickOnSpace(String spaceName) throws InterruptedException {
+        try{
+            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);}
+        catch (Exception e){}
         final String[] modalHeading = new String[1];
-        navigateUsingJSToAnElementEnd(driver,temp.findElement(By.className(spacesListSection)));
+        navigateUsingJSToAnElementEnd(driver, temp.findElement(By.className(spacesListSection)));
         testReport.log("User is in service point section");
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-        spaces.stream().filter(s->s.getText().equalsIgnoreCase(spaceName)).forEach(s->{
-            new WebDriverWait(driver,3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
-            clickOnElementJS(driver,s);
+        spaces.stream().filter(s -> s.getText().equalsIgnoreCase(spaceName)).forEach(s -> {
+            new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
+            clickOnElementJS(driver, s);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            testReport.log("User is in Service Point modal of "+spaceName);
+            testReport.log("User is in Service Point modal of " + spaceName);
             testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
@@ -116,7 +124,7 @@ public class BuyingProcess extends commonMethods {
         buyingProcessLinks.stream().filter(s -> !s.getAttribute(attName).toLowerCase().contains("google") &&
                 !s.getAttribute(attName).toLowerCase().contains("tel")).forEach(s -> {
             try {
-                linksValid[0] = linksValid[0] && makeUrlConnection(s)==(s.getAttribute(attName).contains("instagram")?405:200);
+                linksValid[0] = linksValid[0] && makeUrlConnection(s) == (s.getAttribute(attName).contains("instagram") ? 405 : 200);
             } catch (IOException e) {
                 LOG.error(e);
                 e.printStackTrace();

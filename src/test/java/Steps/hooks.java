@@ -20,9 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class hooks extends Utils {
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
-    private static RemoteWebDriver driver, desktopDriver, mobileDriver;
     private static final Logger LOG = LogManager.getLogger(hooks.class);
-
+    private static RemoteWebDriver driver, desktopDriver, mobileDriver;
 
     @Before("@Mobile")
     public static void openMobileBrowser() throws IOException {
@@ -68,7 +67,7 @@ public class hooks extends Utils {
             capabilities.setCapability("deviceGroup", "KOBITON");
             try {
                 mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
-            }catch (Exception e){
+            } catch (Exception e) {
                 LOG.error(e);
                 throw e;
             }
@@ -111,6 +110,7 @@ public class hooks extends Utils {
             localDrivers.get().close();
             localDrivers.get().quit();
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -129,7 +129,7 @@ public class hooks extends Utils {
                     options.addArguments("user-data-dir=target/ChromeData");
                     try {
                         desktopDriver = new ChromeDriver(options);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         LOG.error(e);
                         throw e;
                     }
@@ -142,7 +142,7 @@ public class hooks extends Utils {
                     firefoxOptions.setBinary(firefoxBinary);
                     try {
                         desktopDriver = new FirefoxDriver(firefoxOptions);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         LOG.error(e);
                         throw e;
                     }
@@ -150,7 +150,7 @@ public class hooks extends Utils {
                 case "safari":
                     try {
                         desktopDriver = new SafariDriver();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         LOG.error(e);
                         throw e;
                     }
