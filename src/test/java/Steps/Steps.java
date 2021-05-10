@@ -333,7 +333,7 @@ public class Steps extends Utils {
             FuelPrices actualSavingsValue = null;
             FuelPrices expectedSavingsValue;
             Long actualSaving = null;
-            double milesToKM = Math.floor((rangeData.miles == 0 ? 233 : rangeData.miles) * 1.60934);
+            double milesToKM = Math.round((rangeData.miles == 0 ? 233 : rangeData.miles) * 1.60934);
             try {
                 if (globalPageName.equalsIgnoreCase("Polestar2")) {
                     if (stateName == null) {

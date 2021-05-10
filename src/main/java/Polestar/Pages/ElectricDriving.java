@@ -51,7 +51,7 @@ public class ElectricDriving extends commonMethods {
     private WebElement sectionNavigatedTo;
     @FindBy(css = "[data-name]")
     private List<WebElement> sections;
-    @FindBy(css = "[class='css-t8cify'],[class='css-1kvol9r']>h1")
+    @FindBy(css = "[class='css-1kvol9r']>h1,[class='css-bfldvu']>h1")
     private WebElement modalOpen;
     @FindBy(className = "css-1qbfuld")
     private List<WebElement> spaces;
@@ -118,8 +118,6 @@ public class ElectricDriving extends commonMethods {
         new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
         new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
-        testReport.log("User is in section" + view);
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
@@ -178,8 +176,6 @@ public class ElectricDriving extends commonMethods {
     }
 
     public RangeData calculateMiles() {
-        testReport.log("screenshot for " + rangeMiles.getText() + " miles");
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return new RangeData(Integer.parseInt(rangeCharge.getText()), Integer.parseInt(rangeChargePercentage.getText()),
                 Integer.parseInt(rangeMiles.getText()));
     }

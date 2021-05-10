@@ -30,11 +30,11 @@ public class BuyingProcess extends commonMethods {
     private WebElement cookieBar;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
-    @FindBy(css = "div[class='css-13j3osp']")
+    @FindBy(css = "div[class='css-1eh5vff']")
     private WebElement tabHeadingView;
     @FindBy(className = "css-d29to2")
     private List<WebElement> tabHeadings;
-    @FindBy(css = ".css-13j3osp button[class='css-47lmvx']>span")
+    @FindBy(css = ".css-1eh5vff button[class='css-47lmvx']>span")
     private WebElement sectionNavigatedTo;
     @FindBy(css = "[data-name]")
     private List<WebElement> sections;
@@ -80,8 +80,6 @@ public class BuyingProcess extends commonMethods {
         new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
         new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
-        testReport.log("User is in section" + view);
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
@@ -96,8 +94,6 @@ public class BuyingProcess extends commonMethods {
         catch (Exception e){}
         final String[] modalHeading = new String[1];
         navigateUsingJSToAnElementEnd(driver, temp.findElement(By.className(spacesListSection)));
-        testReport.log("User is in service point section");
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         spaces.stream().filter(s -> s.getText().equalsIgnoreCase(spaceName)).forEach(s -> {
             new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
             clickOnElementJS(driver, s);
@@ -106,8 +102,6 @@ public class BuyingProcess extends commonMethods {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            testReport.log("User is in Service Point modal of " + spaceName);
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
         clickOnElement(closeCTA);

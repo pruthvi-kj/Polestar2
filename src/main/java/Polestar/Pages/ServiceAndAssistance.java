@@ -80,8 +80,6 @@ public class ServiceAndAssistance extends commonMethods {
         new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
         new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
-        testReport.log("User is in section" + view);
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
@@ -96,8 +94,7 @@ public class ServiceAndAssistance extends commonMethods {
         catch (Exception e){}
         final String[] modalHeading = new String[1];
         navigateUsingJSToAnElementEnd(driver, temp.findElement(By.className(servicePointsListSection)));
-        testReport.log("User is in service point section");
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+
         servicePoints.stream().filter(s -> s.getText().equalsIgnoreCase(servicePointName)).forEach(s -> {
             new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
             clickOnElementJS(driver, s);
@@ -106,8 +103,6 @@ public class ServiceAndAssistance extends commonMethods {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            testReport.log("User is in Service Point modal of " + servicePointName);
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
         clickOnElement(closeCTA);

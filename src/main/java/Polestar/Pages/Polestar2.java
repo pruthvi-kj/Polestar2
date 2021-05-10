@@ -126,7 +126,7 @@ public class Polestar2 extends commonMethods {
                         .ignoring(NoSuchElementException.class);
                 waitF.until(localDriver -> localDriver.findElement(By.className("css-113edzk")));
                 ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-                WebDriverWait wait = new WebDriverWait(driver, 5);
+                WebDriverWait wait = new WebDriverWait(driver, 3);
                 wait.until(ExpectedConditions.visibilityOf(cookieBar));
                 wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
             } catch (Exception e) {
@@ -328,7 +328,7 @@ public class Polestar2 extends commonMethods {
     }
 
     public String onModal() {
-        String modalName = new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
+        String modalName = new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
         return modalName;
     }
 
