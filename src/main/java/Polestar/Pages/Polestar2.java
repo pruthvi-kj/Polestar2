@@ -18,8 +18,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.TestInitialization;
-import utils.TestReport;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -45,7 +43,6 @@ public class Polestar2 extends commonMethods {
     private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
     private static XSSFSheet sheet;
     private static RemoteWebDriver driver;
-    private static TestReport testReport;
     private static WebElement temp;
     private Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
@@ -120,11 +117,6 @@ public class Polestar2 extends commonMethods {
         driver.switchTo().defaultContent();
         try {
             try {
-                Wait<WebDriver> waitF = new FluentWait<>(driver)
-                        .withTimeout(Duration.ofSeconds(5))
-                        .pollingEvery(Duration.ofSeconds(1))
-                        .ignoring(NoSuchElementException.class);
-                waitF.until(localDriver -> localDriver.findElement(By.className("css-113edzk")));
                 ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
                 WebDriverWait wait = new WebDriverWait(driver, 3);
                 if(wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
@@ -145,7 +137,6 @@ public class Polestar2 extends commonMethods {
         mapping.put("ORDER NOW", orderNowCta);
         mapping.put("BOOK A TEST DRIVE", bookATestDriveHU);
         mapping.put("RANGE CALCULATOR PDP", rangeCalcComp);
-        testReport = TestInitialization.getInstance();
     }
 
     public void getChargingModalSection(String chargingSectionName) throws InterruptedException {
@@ -355,6 +346,11 @@ public class Polestar2 extends commonMethods {
     }
 
     public String navigateToSectionUsingNavBar(String sectionName) throws InterruptedException {
+        Wait<RemoteWebDriver> waitF = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(3))
+                .pollingEvery(Duration.ofSeconds(1))
+                .ignoring(NoSuchElementException.class);
+        waitF.until(localDriver -> localDriver.findElement(By.className("css-113edzk")));
         navBarIds.stream().filter(s -> s.getAttribute("data-label").equalsIgnoreCase(sectionName)).forEach(s -> {
             new Actions(driver).moveToElement(navBar).build().perform();
             new Actions(driver).moveToElement(s).click().build().perform();

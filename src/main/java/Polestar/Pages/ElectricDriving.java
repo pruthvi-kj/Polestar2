@@ -12,8 +12,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.TestInitialization;
-import utils.TestReport;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ public class ElectricDriving extends commonMethods {
 
     public static WebElement temp;
     private static RemoteWebDriver driver;
-    private static TestReport testReport;
     private Map<String, WebElement> mapping = new HashMap<>();
 
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
@@ -102,7 +99,6 @@ public class ElectricDriving extends commonMethods {
         while (acceptCookies.isDisplayed())
             clickOnElementJS(driver, acceptCookies);
         mapping.put("TAB HEADINGS", tabHeadingView);
-        testReport = TestInitialization.getInstance();
     }
 
     public void navigateToView(String view) throws InterruptedException {
