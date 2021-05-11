@@ -79,8 +79,8 @@ public class HeaderAndFooter extends commonMethods {
                 waitF.until(localDriver -> localDriver.findElement(By.className("css-113edzk")));
                 ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
                 WebDriverWait wait = new WebDriverWait(driver, 5);
-                wait.until(ExpectedConditions.visibilityOf(cookieBar));
-                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
+                if(wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
+                    wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
             } catch (Exception e) {
                 LOG.error(e.getMessage());
                 LOG.error(e.getStackTrace());

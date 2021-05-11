@@ -127,8 +127,8 @@ public class Polestar2 extends commonMethods {
                 waitF.until(localDriver -> localDriver.findElement(By.className("css-113edzk")));
                 ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
                 WebDriverWait wait = new WebDriverWait(driver, 3);
-                wait.until(ExpectedConditions.visibilityOf(cookieBar));
-                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
+                if(wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
+                    wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
             } catch (Exception e) {
                 LOG.error(e.getMessage());
                 LOG.error(e.getStackTrace());
@@ -152,7 +152,6 @@ public class Polestar2 extends commonMethods {
         chargingModalHeadings.stream().filter(s -> s.getAttribute("title").equalsIgnoreCase(chargingSectionName))
                 .forEach(s -> clickOnElementJS(driver, s));
         Thread.sleep(1000);
-
     }
 
     public void updateSliderPosition(int startChargePercentage, int endChargePercentage) throws InterruptedException {
