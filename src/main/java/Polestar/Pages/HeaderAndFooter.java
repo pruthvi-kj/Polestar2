@@ -23,9 +23,9 @@ import java.util.*;
 public class HeaderAndFooter extends commonMethods {
 
     private static final Logger LOG = LogManager.getLogger(HeaderAndFooter.class);
-    private static Map<String, WebElement> mapping = new HashMap<String, WebElement>();
+    private Map<String, WebElement> mapping = new HashMap<String, WebElement>();
     private static WebDriver driver;
-    private static String globalHeaderOrFooter;
+    private String globalHeaderOrFooter;
     @FindBy(css = ".css-os9k16 [href]")
     private List<WebElement> headerLinks;
     @FindBy(css = "a[class='css-1asux84']")

@@ -71,16 +71,16 @@ Feature: Verify the navigation in Footer
 #      | Social       | Subscribe          | Newsletter sign up                                             |
 #
 #
-#@Desktop
-#Scenario: Verify footer links
-#Given User is in "HeaderAndFooter" page
-#When user navigates to footer
-#Then verify that all the links are valid
-#
-#  @Footer @Desktop
-#  Scenario: Verify the Change Location link from Polestar 2 homepage footer
-#    Given User is in "HeaderAndFooter" page
-#    When user navigates to footer
-#    And clicks on "Change Location"
-#    Then Verify the user navigates to "Select your region"
-#    And when user clicks on close user lands on Polestar2 homepage
+@Desktop @Footer
+Scenario: Verify footer links
+Given User is in "HeaderAndFooter" page
+When user navigates to footer
+Then verify that all the links are valid
+
+  @Footer @Desktop
+  Scenario: Verify the Change Location link from Polestar 2 homepage footer
+    Given User is in "HeaderAndFooter" page
+    When user navigates to footer
+    And clicks on "Change Location"
+    Then Verify the user navigates to "Select your region"
+    And when user clicks on close user lands on Polestar2 homepage

@@ -47,7 +47,7 @@ public class Polestar2 extends commonMethods {
     private static RemoteWebDriver driver;
     private static TestReport testReport;
     private static WebElement temp;
-    Map<String, WebElement> mapping = new HashMap<>();
+    private Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
     @FindBy(className = "css-1ink1h8")

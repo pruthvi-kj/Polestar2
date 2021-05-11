@@ -37,8 +37,8 @@ public class ElectricDriving extends commonMethods {
     public static WebElement temp;
     private static RemoteWebDriver driver;
     private static TestReport testReport;
+    private Map<String, WebElement> mapping = new HashMap<>();
 
-    Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
     private WebElement cookieBar;
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")

@@ -40,23 +40,23 @@ public class Steps extends Utils {
     private static final double fuelVehicleEnergyConsumption = 0.083;
     private static final double weeksInYear = 52.1775;
     private static final Logger LOG = LogManager.getLogger(Steps.class);
-    private static ArrayList<String> expectedCallout, actualCallout = new ArrayList<>();
+    private ArrayList<String> expectedCallout, actualCallout = new ArrayList<>();
     private static RemoteWebDriver driver;
     private static Class<?> cls;
     private static Object obj;
-    private static String globalChargingSectionName;
+    private String globalChargingSectionName;
     private static TestReport testReport;
-    private static List<String> globalExpectedServicePointHeadings;
-    private static List<String> globalActualServicePointHeadings;
-    private static List<String> globalExpectedSpacesHeadings;
-    private static List<String> globalActualSpacesHeadings;
+    private List<String> globalExpectedServicePointHeadings;
+    private List<String> globalActualServicePointHeadings;
+    private List<String> globalExpectedSpacesHeadings;
+    private List<String> globalActualSpacesHeadings;
     private List<String> globalActualSectionName;
     private List<String> globalExpectedSectionName;
     private List<String> globalActualModals;
     private List<String> globalExpectedModals;
-    private static List<LocalTime> expectedTimes;
-    private static List<LocalTime> actualTimes;
-    private static String globalPageName;
+    private List<LocalTime> expectedTimes;
+    private List<LocalTime> actualTimes;
+    private String globalPageName;
     private String stateName = null;
     private ChargeData chargeData;
     private List<RangeData> rangeData1;
@@ -164,9 +164,10 @@ public class Steps extends Utils {
     }
 
     @When("user navigates to {string}")
-    public void userNavigatesTo(String view) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void userNavigatesTo(String view) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
         callMethod(cls, obj, "navigateToView", view);
-        testReport.log("User is in section"+view);
+        Thread.sleep(1000);
+        testReport.log("User is in section "+view);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
     }
 
@@ -200,11 +201,11 @@ public class Steps extends Utils {
         globalExpectedModals.forEach(s -> {
             try {
                 callMethod(cls, obj, "navigateToView", s);
-                testReport.log("User is in section"+s);
+                testReport.log("User is in section "+s);
                 testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
                 callMethod(cls, obj, "clickOnLearnMore");
                 globalActualModals.add((String) callMethod(cls, obj, "onModal"));
-                testReport.log("User is in modal"+globalActualModals.get(globalActualModals.size()-1));
+                testReport.log("User is in modal "+globalActualModals.get(globalActualModals.size()-1));
                 testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -213,12 +214,13 @@ public class Steps extends Utils {
     }
 
     @When("clicks on Learn More under {string} section")
-    public void clicksOnUnderSection(String sectionName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public void clicksOnUnderSection(String sectionName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InterruptedException {
         callMethod(cls, obj, "navigateToView", sectionName);
         testReport.log("User is in section "+sectionName);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
         callMethod(cls, obj, "clickOnLearnMore");
-        testReport.log("User is in modal of"+sectionName);
+        Thread.sleep(1000);
+        testReport.log("User is in modal of "+sectionName);
         testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
     }
 
@@ -295,7 +297,7 @@ public class Steps extends Utils {
             try {
                 callMethod(cls, obj, "updateSliderPosition", s);
                 rangeData1.add((RangeData) callMethod(cls, obj, "calculateMiles"));
-                testReport.log("screenshot for miles"+rangeData1.get(rangeData1.size()-1).miles);
+                testReport.log("screenshot for miles "+rangeData1.get(rangeData1.size()-1).miles);
                 testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -333,7 +335,8 @@ public class Steps extends Utils {
             FuelPrices actualSavingsValue = null;
             FuelPrices expectedSavingsValue;
             Long actualSaving = null;
-            double milesToKM = Math.round((rangeData.miles == 0 ? 233 : rangeData.miles) * 1.60934);
+            double milesToKM = (rangeData.miles == 0 ? 233 : rangeData.miles);
+            double km= milesToKM % 10>5 ? Math.ceil(milesToKM*1.609): Math.floor(milesToKM*1.609);
             try {
                 if (globalPageName.equalsIgnoreCase("Polestar2")) {
                     if (stateName == null) {
@@ -343,8 +346,7 @@ public class Steps extends Utils {
                         callMethod(cls, obj, "clickOnLearnMore");
                         callMethod(cls, obj, "getChargingModalSection", "Savings");
                     }
-                    testReport.log("user is in section of Savings");
-                    testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+
                     actualSavingsValue = (FuelPrices) callMethod(cls, obj, "getSavingsValue", "Savings");
                     for (Field field : actualSavingsValue.getClass().getDeclaredFields()) {
                         field.setAccessible(true);
@@ -354,12 +356,14 @@ public class Steps extends Utils {
                     actualSaving = (Long) (callMethod(cls, obj, "getSavingsValue"));
                     testReport.log("Actual Savings: " + actualSaving);
                 }
-
+                testReport.log("Savings value calculated");
+                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
 
                 //getting state code and fuel price
                 FuelPrices price = apiCall.getFuelPrice(stateCode == null ? "US" : "US_" + stateCode);
 
-                expectedSavingsValue = calculateExpenses(milesToKM, price);
+                assert price != null;
+                expectedSavingsValue = calculateExpenses(km, price);
 
 //                    expectedSavingsValue.yearCostForPolestar2=Math.round((polestar2EnergyConsumption * weeksInYear * milesToKM) * price.electricityPrice);
 //                    expectedSavingsValue.yearCostForFuelCar=Math.round((fuelVehicleEnergyConsumption * weeksInYear * milesToKM) * price.fuelPrice);

@@ -73,8 +73,8 @@ Feature: Verify the navigation in Header
 #      | Legal   | Polestar legal                 |
 #      | Media   | Polestar media newsroom - Home |
 
-#    @Header @Desktop
-#    Scenario: Verify the Header links on Polestar 2 homepage for Hamburger Menu
-#      Given User is in "HeaderAndFooter" page
-#      When user navigates to header
-#      Then verify that all the links are valid
+    @Header @Desktop
+    Scenario: Verify the Header links on Polestar 2 homepage for Hamburger Menu
+      Given User is in "HeaderAndFooter" page
+      When user navigates to header
+      Then verify that all the links are valid
