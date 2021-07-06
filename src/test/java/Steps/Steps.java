@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static Polestar.Utils.commonMethods.makeUrlConnection;
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.testng.Assert.*;
 
@@ -375,9 +376,10 @@ public class Steps extends Utils {
                     for (Field field : expectedSavingsValue.getClass().getDeclaredFields()) {
                         field.setAccessible(true);
                         testReport.log("Expected " + field.getName() + ": " + field.get(expectedSavingsValue));
-                        assertTrue(reflectionEquals(expectedSavingsValue, actualSavingsValue), "miles calculated do not match");
                     }
-                } else if (globalPageName.equalsIgnoreCase("ElectricDriving")) {
+                    assertTrue(reflectionEquals(expectedSavingsValue, actualSavingsValue), "miles calculated do not match");
+                }
+                else if (globalPageName.equalsIgnoreCase("ElectricDriving")) {
                     testReport.log("Expected Savings: " + expectedSavingsValue.yearEstimatedFuelSavings);
                     assertTrue(reflectionEquals(expectedSavingsValue.yearEstimatedFuelSavings, actualSaving), "miles calculated do not match");
                 }
@@ -555,6 +557,12 @@ public class Steps extends Utils {
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    @When("i have to verify {string}")
+    public void iHaveToVerify(String link) throws IOException {
+        LOG.info(makeUrlConnection(link)+"dummy");
+
     }
 
 //    @And("user update the slider position for Savings calculation")

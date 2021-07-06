@@ -89,7 +89,7 @@ public class ElectricDriving extends commonMethods {
         try {
             ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
             WebDriverWait wait = new WebDriverWait(driver, 5);
-            wait.until(ExpectedConditions.visibilityOf(heroImage));
+//            wait.until(ExpectedConditions.visibilityOf(heroImage));
             if(wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
                 wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
         } catch (Exception e) {

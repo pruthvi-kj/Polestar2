@@ -14,7 +14,6 @@ public class TestInitialization {
     }
 
     private TestInitialization() {
-
     }
 
     public static synchronized void init() {

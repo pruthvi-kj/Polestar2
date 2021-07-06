@@ -140,6 +140,14 @@ public class commonMethods {
         LOG.info("CTA- " + element.getAttribute("textContent") + ", URL- " + element.getAttribute(attName) + ", Response Code- " + connection.getResponseCode() + connection.getResponseMessage());
         return connection.getResponseCode();
     }
+    public static int makeUrlConnection(String element) throws IOException {
+        String attName = "href";
+        HttpURLConnection connection = (HttpURLConnection) new URL(element).openConnection();
+        connection.setRequestMethod("HEAD");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        connection.connect();
+        return connection.getResponseCode();
+    }
 
     public int getColumnIndex(Row firstRow, String a) {
         Iterator<Cell> cell = firstRow.cellIterator();

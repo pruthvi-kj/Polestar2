@@ -78,8 +78,7 @@ public class TestReport {
     }
 
     public void logImage(String base64Image) {
-        String message = "<img src=\"data:image/png;base64, " + base64Image + "\" width=\"100%\" />";
-        currentTest.get().log(Status.INFO, message);
+        currentTest.get().addScreenCaptureFromBase64String(base64Image);
     }
 
     public void log(String message) {
