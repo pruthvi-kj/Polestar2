@@ -7,9 +7,9 @@ Feature: Verify Service And Assistance page
   Scenario: Verify navigation using Tab Headings
     When user navigates to "tab headings"
     And user clicks on tab
-      | Maintenance |
-      | Service points |
-      | Questions |
+      | Maintenance         |
+      | Service points      |
+      | Questions           |
       | Roadside assistance |
     Then verify that user lands on the selected section
 
@@ -22,8 +22,8 @@ Feature: Verify Service And Assistance page
   Scenario: Verify that on clicking on Learn More, user lands on modal
     When clicks on service point under "Service points" section
       | Los Angeles |
-      | San Jose |
-      | Boston |
+      | San Jose    |
+      | Boston      |
     Then Verify the user lands on selected service point modal
 
 

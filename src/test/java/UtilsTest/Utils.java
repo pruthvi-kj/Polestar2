@@ -11,6 +11,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -130,6 +132,13 @@ public class Utils {
         fp.monthCostForFuelCar = Math.round(((fuelVehicleEnergyConsumption * weeksInYear * milesToKM) / 12) * price.fuelPrice);
         fp.monthEstimatedFuelSavings = fp.monthCostForFuelCar - fp.monthCostForPolestar2;
         return fp;
+    }
+
+    public static StringWriter getLog(Exception e){
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw;
     }
 
 }

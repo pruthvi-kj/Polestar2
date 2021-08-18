@@ -39,18 +39,18 @@ Feature: Verify Polestar2 page
     Then Verify the user navigates to "Book a Polestar test drive | Polestar US"
 
   @Desktop @PS2
-    Scenario: Verify the range calculator
-      When user navigates to "Range"
-      And user update the slider position
-        | 20 |
-        | 60 |
-      Then verify the miles calculated
+  Scenario: Verify the range calculator
+    When user navigates to "Range"
+    And user update the slider position
+      | 20 |
+      | 60 |
+    Then verify the miles calculated
 
   @Desktop @PS2
   Scenario: Verify that on clicking on Learn More user lands on modal and able to click on all tab headings
     When clicks on Learn More under section
-      | Interior |
-      | Safety |
+      | Interior     |
+      | Safety       |
       | Infotainment |
     Then Verify the user lands on modal
 
@@ -63,16 +63,16 @@ Feature: Verify Polestar2 page
   Scenario: Verify that on clicking on See More in design feature intro, user lands on modal
     When clicks on See More under feature
       | Panoramic glass roof |
-      | Frameless mirrors |
+      | Frameless mirrors    |
     Then Verify the user lands on modal
 
   @Desktop @PS2
   Scenario: Verify the time calculation under Charging modal
     When clicks on Learn More under "Range" section
     And the configuration to set as below
-      | ChargerType | PowerOutput | Start% | End% |
-      | Home Charging | 3.7 | 20 | -10 |
-      | Public Charging | 150 | 20 | 10 |
+      | ChargerType     | PowerOutput | Start% | End% |
+      | Home Charging   | 3.7         | 20     | -10  |
+      | Public Charging | 150         | 20     | 10   |
     Then verify the charge time calculated
 
   @Desktop @PS2
@@ -99,23 +99,19 @@ Feature: Verify Polestar2 page
     And selects "<State>" as the state
     Then verify the savings
     Examples:
-      | State |
-      | Arizona |
-      | Maryland |
-      | California |
-      | Washington |
+      | State      |
+      | Arizona    |
 
   @Desktop @PS2
-  Scenario Outline: Verify navigation to sections using nav bar
+  Scenario: Verify navigation to sections using nav bar
     When user clicks on section in nav bar
       | Exterior |
       | Interior |
     Then verify that user lands on the selected section
-    Examples:
 
   @Desktop @PS2
   Scenario: Verify Polestar 2 links
     Then verify that all the links are valid
-#
+
 #Scenario: junk
 #  Given  some shit

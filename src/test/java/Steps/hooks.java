@@ -71,7 +71,7 @@ public class hooks extends Utils {
                 LOG.error(e);
                 throw e;
             }
-            mobileDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+            mobileDriver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
         }
         driver = mobileDriver;
         localDrivers.set(driver);
@@ -165,7 +165,7 @@ public class hooks extends Utils {
 //
 //                desktopDriver = new ChromeDriver(chromeOptions);
             }
-            desktopDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+            desktopDriver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
             desktopDriver.manage().window().maximize();
         }
         driver = desktopDriver;

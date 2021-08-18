@@ -31,11 +31,11 @@ public class Polestar2 extends commonMethods {
     private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static final String sliderComponent = "[class='css-1nqf9b0']";
     private static final String startEndSliderId = "[class='css-1nqf9b0']>div>div";
-    private static final String savingsValueComponent = "[class='css-klf5ss']";
+    private static final String savingsValueComponent = "[class='css-1nyh405']";
     private static final String yearMonthSelector = "css-u6if8s";
     private static final String costForMiles = "[class='css-185z86n']>label";
-    private static final String estimatedFuelSavings = "css-xjcxgn";
-    private static final String estimatedChargeTime = "css-15bk8jn";
+    private static final String estimatedFuelSavings = "css-1um87zq";
+    private static final String estimatedChargeTime = "css-111c08i";
     private static final String startEndChangePercentage = "css-yv1aru";
     private static final String chargingSliderComponent = "[class='css-9lvjku']";
     private static final String chargerTypeId = "[data-testid]";
@@ -53,39 +53,31 @@ public class Polestar2 extends commonMethods {
     private List<WebElement> keyStatsHighlights;
     @FindBy(className = "css-3ycsxw")
     private List<WebElement> keyStatsHighlightsLease;
-    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Panoramic glass roof']/..//div[text()='See More']")
-    private WebElement panoramicGlassRoofSeeMore;
-    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Frameless mirrors']/..//div[text()='See More']")
-    private WebElement seeMoreFrameless;
-    @FindBy(xpath = "//p[@class='css-92kwuh' and text()='Pixel LED lights']/..//div[text()='See More']")
-    private WebElement seeMoreLEDLights;
-    @FindBy(className = "css-138i4qw")
-    private WebElement exteriorView;
-    @FindBy(className = "css-1sb6ikf")
+    @FindBy(css = ".css-12lf4sx,.css-pmkm1x")
     private WebElement closeCTA;
-    @FindBy(className = "css-j07xvw")
+    @FindBy(css = "[class*='e1wy6baj5']")
     private WebElement orderNowCta;
-    @FindBy(className = "css-zgmw7k")
+    @FindBy(className = "css-e8sj3j")
     private WebElement heroUnit;
-    @FindBy(className = "css-azo2pw")
+    @FindBy(css = "[class*='e1wy6baj6']")
     private WebElement bookATestDriveHU;
-    @FindBy(css = "[class='css-1k4t3n2']>div:nth-child(3)")
+    @FindBy(css = "[class='css-12qn6e6']>div:nth-child(3)")
     private WebElement rangeSlider;
-    @FindBy(css = "[class='css-1k4t3n2']>div:nth-child(3) span[class='css-yv1aru']")
+    @FindBy(css = "[class='css-12qn6e6']>div:nth-child(3) span[class='css-1408r7f']")
     private WebElement rangeChargePercentage;
-    @FindBy(css = "[class='css-1k4t3n2']>div:nth-child(3) div[class='css-aaonyv']>span[class='css-1algwbp']")
+    @FindBy(css = "[class='css-12qn6e6']>div:nth-child(3) div[class='css-15ym8zq']>span[class='css-1algwbp']")
     private WebElement rangeCharge;
-    @FindBy(css = "[class='css-1k4t3n2']>div:nth-child(3) p[class='css-1algwbp']")
+    @FindBy(css = "[class='css-12qn6e6']>div:nth-child(3) p[class='css-1algwbp'")
     private WebElement rangeMiles;
     @FindBy(className = "css-bchlgi")
     private WebElement rangeCalcComp;
-    @FindBy(className = "css-1k4t3n2")
+    @FindBy(className = "css-mfb5yc")
     private WebElement range;
     @FindBy(css = "div[data-name], section[data-name]")
     private List<WebElement> sections;
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
     private WebElement cookieBar;
-    @FindBy(css = "div[class='css-1kvol9r']")
+    @FindBy(css = "div[class='css-wkb1an']")
     private WebElement modalOpen;
     @FindBy(className = "css-5eui9h")
     private List<WebElement> modalSections;
@@ -99,13 +91,13 @@ public class Polestar2 extends commonMethods {
     private WebElement stateNameId;
     @FindBy(className = "css-18rtpmq")
     private WebElement stateSelectionClearBtn;
-    @FindBy(className = "css-147hag1")
+    @FindBy(className = "css-14fom5l")
     private List<WebElement> navBarIds;
     @FindBy(className = "css-113edzk")
     private WebElement navBar;
-    @FindBy(className = "css-1gprnpu")
+    @FindBy(className = "css-kqytgu")
     private WebElement selectedNavBar;
-    @FindBy(css = ".css-u6if8s>button")
+    @FindBy(css = ".css-1mzgy7p .css-u6if8s>button")
     private List<WebElement> selectedTabBar;
     @FindBy(css = "[class='css-yp9swi'] [href]")
     private List<WebElement> polestar2Links;
@@ -116,24 +108,17 @@ public class Polestar2 extends commonMethods {
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         try {
-            try {
-                ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-                WebDriverWait wait = new WebDriverWait(driver, 3);
-                if(wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
+            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
+            WebDriverWait wait = new WebDriverWait(driver, 3);
+            if (cookieBar.getAttribute("style").equalsIgnoreCase("bottom: 0px;")) {
+                if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
                     wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
-            } catch (Exception e) {
-                LOG.error(e.getMessage());
-                LOG.error(e.getStackTrace());
-            }
-            while (acceptCookies.isDisplayed()) {
-                clickOnElementJS(driver, acceptCookies);
+                while (acceptCookies.isDisplayed())
+                    clickOnElementJS(driver, acceptCookies);
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            LOG.error(e.getStackTrace());
+            throw new RuntimeException(e);
         }
-        mapping.put("EXTERIOR PDP", exteriorView);
-        mapping.put("PANORAMIC GLASS ROOF SEE MORE", panoramicGlassRoofSeeMore);
         mapping.put("ORDER NOW", orderNowCta);
         mapping.put("BOOK A TEST DRIVE", bookATestDriveHU);
         mapping.put("RANGE CALCULATOR PDP", rangeCalcComp);
@@ -162,13 +147,12 @@ public class Polestar2 extends commonMethods {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
             temp.findElements(By.cssSelector(costForMiles)).forEach(p -> {
                 scrollToElementUsingActionClass(driver, p);
-                values.add(Long.parseLong(p.getText().split(" ")[1]));
+                values.add(Long.parseLong(p.getText().replaceAll("[^0-9]", "")));
             });
-            values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().split(" ")[1]));
+            values.add(Long.parseLong(temp.findElement(By.className(estimatedFuelSavings)).getText().replaceAll("[^0-9]", "")));
             clickOnElement(s);
         });
 
@@ -201,6 +185,10 @@ public class Polestar2 extends commonMethods {
     }
 
     public void clickOnSeeMore(String feature) {
+        try {
+            clickOnElement(closeCTA);
+        } catch (Exception e) {
+        }
         designIntroFeatureList.stream().filter(s -> s.findElement(By.cssSelector("p")).getText().equalsIgnoreCase(feature)).
                 forEach(s -> clickOnElement(s.findElement(By.cssSelector(learnOrSeeMoreCta))));
     }
@@ -210,10 +198,11 @@ public class Polestar2 extends commonMethods {
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        try{
-        new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
-        clickOnElement(closeCTA);}
-        catch (Exception e){}
+        try {
+            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);
+        } catch (Exception e) {
+        }
         Wait<RemoteWebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofSeconds(1))
@@ -246,13 +235,8 @@ public class Polestar2 extends commonMethods {
             Row r = rows.next();
             String a = getCellValue(r, xpathIndex);
             WebElement elementToVerify;
-            try {
-                assert a != null;
-                elementToVerify = driver.findElement(By.xpath(a));
-            } catch (Exception e) {
-                LOG.error(e.getCause());
-                throw e;
-            }
+            assert a != null;
+            elementToVerify = driver.findElement(By.xpath(a));
             scrollToElementUsingActionClass(driver, elementToVerify);
             if (elementToVerify.getText().equalsIgnoreCase(a)) {
                 r.createCell(textIndex).setCellValue(elementToVerify.getText());
@@ -289,13 +273,7 @@ public class Polestar2 extends commonMethods {
         ArrayList<String> calloutActual = new ArrayList<>();
         List<WebElement> elementToVerify;
         //read data from UI and put it in an array list
-        try {
-            elementToVerify = driver.findElements(By.xpath("//p[text()='" +
-                    section + "']/../..//p[@data-testid]"));
-        } catch (Exception e) {
-            LOG.error(e.getStackTrace());
-            throw e;
-        }
+        elementToVerify = driver.findElements(By.xpath("//p[text()='"+ section +"']/../..//p[@data-testid]"));
         scrollToElementUsingActionClass(driver, elementToVerify.get(0));
         for (WebElement e : elementToVerify) {
             calloutActual.add(e.getText());
@@ -327,7 +305,7 @@ public class Polestar2 extends commonMethods {
             try {
                 new WebDriverWait(driver, 2).until(ExpectedConditions.elementToBeClickable(modalSections.get(i)));
                 modalSections.get(i).click();
-                System.out.println(modalSections.get(i).getAttribute("textContent") + "section");
+                Thread.sleep(2000);
                 int finalI = i;
                 selectedTabBar.stream().filter(s -> s.findElement(By.cssSelector("span")).getAttribute("textContent")
                         .equalsIgnoreCase(modalSections.get(finalI).getAttribute("textContent"))).forEach(s ->
@@ -368,8 +346,7 @@ public class Polestar2 extends commonMethods {
             try {
                 linksValid.set(linksValid.get() && makeUrlConnection(s) == (s.getAttribute(attName).contains("instagram") ? 405 : 200));
             } catch (IOException e) {
-                LOG.error(e);
-                e.printStackTrace();
+                LOG.error(e.getCause());
             }
         });
         return linksValid.get();

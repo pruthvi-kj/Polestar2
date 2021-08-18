@@ -5,6 +5,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = "src/test/java/Features",
+        tags = "@BP",
         glue = "Steps",
         plugin = {"pretty", "html:target/Destination", "de.monochromata.cucumber.report.PrettyReports:target/cucumber",
                 "json:target/jsonReport/cucumber.json", "listener.ListenerPlugin"}

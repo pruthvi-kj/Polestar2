@@ -79,10 +79,12 @@ public class TestReport {
 
     public void logImage(String base64Image) {
         currentTest.get().addScreenCaptureFromBase64String(base64Image);
+        extent.flush();
     }
 
     public void log(String message) {
         currentTest.get().log(Status.INFO, message);
         extent.flush();
     }
+
 }

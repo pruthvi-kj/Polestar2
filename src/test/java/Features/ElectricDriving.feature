@@ -53,7 +53,3 @@ Feature: Verify Electric Driving page
   Scenario: Verify the Savings calculation for US
     When user navigates to "Savings"
     Then verify the savings
-
-  @Desktop @ED @123
-  Scenario: Verify Electric Driving links
-    When i have to verify "https://www.polestar.com/us/spaces/sgfdf"

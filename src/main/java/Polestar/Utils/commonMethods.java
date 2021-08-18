@@ -34,11 +34,7 @@ public class commonMethods {
 
 
     public static void clickOnElement(WebElement element) {
-        try {
-            element.click();
-        } catch (Exception e) {
-            throw e;
-        }
+        element.click();
     }
 
     public static void clickOnElementJS(WebDriver driver, WebElement element) {
