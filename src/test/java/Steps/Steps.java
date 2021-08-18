@@ -16,8 +16,8 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.asserts.SoftAssert;
-import utils.TestInitialization;
-import utils.TestReport;
+import Utils.TestInitialization;
+import Utils.TestReport;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

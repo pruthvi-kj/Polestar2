@@ -1,4 +1,4 @@
-package utils.ServicePointsPojo;
+package Polestar.ServicePointsPojo;
 
 import java.util.List;
 

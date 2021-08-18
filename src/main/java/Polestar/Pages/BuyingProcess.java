@@ -1,6 +1,6 @@
 package Polestar.Pages;
 
-import Polestar.Utils.commonMethods;
+import Utils.commonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;

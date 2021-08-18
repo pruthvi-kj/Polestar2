@@ -1,4 +1,4 @@
-package Polestar.Utils;
+package Utils;
 
 import Polestar.Pages.Polestar2;
 import org.apache.logging.log4j.LogManager;

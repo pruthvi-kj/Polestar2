@@ -1,4 +1,4 @@
-package utils.ServicePointsPojo;
+package Polestar.ServicePointsPojo;
 
 public class IndividualServicePoints {
     private String name;
