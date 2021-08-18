@@ -18,9 +18,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-public class hooks extends Utils {
+public class Hooks extends Utils {
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
-    private static final Logger LOG = LogManager.getLogger(hooks.class);
+    private static final Logger LOG = LogManager.getLogger(Hooks.class);
     private static RemoteWebDriver driver, desktopDriver, mobileDriver;
 
     @Before("@Mobile")

@@ -1,7 +1,7 @@
-package listener;
+package Listener;
 
 
-import Steps.hooks;
+import Steps.Hooks;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
@@ -38,14 +38,14 @@ public class ListenerPlugin implements ConcurrentEventListener {
     }
 
     public void onTestRunFinished(TestRunFinished testRunFinished) {
-        hooks.closeDriver();
+        Hooks.closeDriver();
         TestReport.closeThreadLocalCollections();
     }
 
     public void onTestStepFinished(TestStepFinished testStepFinished) {
         List<String> tags = testStepFinished.getTestCase().getTags();
 
-        RemoteWebDriver driver = (RemoteWebDriver) hooks.getDriver();
+        RemoteWebDriver driver = (RemoteWebDriver) Hooks.getDriver();
 //        if (driver != null && driver.getSessionId() != null) {
 //            testReport.log(testStepFinished.getTestStep().getCodeLocation());
 //            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));

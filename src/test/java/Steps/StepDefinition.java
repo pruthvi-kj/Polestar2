@@ -4,7 +4,7 @@ import Polestar.DataMembers.ChargeData;
 import Polestar.DataMembers.FuelPrices;
 import Polestar.DataMembers.RangeData;
 import UtilsTest.Utils;
-import UtilsTest.apiCall;
+import UtilsTest.ApiCall;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -33,10 +33,10 @@ import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.testng.Assert.*;
 
 
-public class Steps extends Utils {
+public class StepDefinition extends Utils {
     final private static String polestar2PageTitle = "Polestar 2 – The 100% electric car | Polestar US";
     private final static int batterySize = 78;
-    private static final Logger LOG = LogManager.getLogger(Steps.class);
+    private static final Logger LOG = LogManager.getLogger(StepDefinition.class);
     private ArrayList<String> expectedCallout, actualCallout = new ArrayList<>();
     private static RemoteWebDriver driver;
     private static Class<?> cls;
@@ -62,7 +62,7 @@ public class Steps extends Utils {
     public void user_is_in_page(String page) {
         try {
             testReport = TestInitialization.getInstance();
-            driver = hooks.getDriver();
+            driver = Hooks.getDriver();
             driver.get(getURL(page));
             cls = Class.forName("Polestar.Pages." + page);
             globalPageName = page;
@@ -466,7 +466,7 @@ public class Steps extends Utils {
                 testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
 
                 //getting state code and fuel price
-                FuelPrices price = apiCall.getFuelPrice(stateCode == null ? "US" : "US_" + stateCode);
+                FuelPrices price = ApiCall.getFuelPrice(stateCode == null ? "US" : "US_" + stateCode);
 
                 assert price != null;
                 expectedSavingsValue = calculateExpenses(km, price);

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class commonMethods {
+public class CommonMethods {
     private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static XSSFWorkbook workbook;
     private static XSSFSheet sheet;

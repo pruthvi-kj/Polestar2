@@ -2,7 +2,7 @@ package Polestar.Pages;
 
 import Polestar.DataMembers.ChargeData;
 import Polestar.DataMembers.RangeData;
-import Utils.commonMethods;
+import Utils.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ElectricDriving extends commonMethods {
+public class ElectricDriving extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(ElectricDriving.class);
     private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
     private static final String chargingSliderComponent = "[class='css-9lvjku']";

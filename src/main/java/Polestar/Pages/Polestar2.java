@@ -3,7 +3,7 @@ package Polestar.Pages;
 import Polestar.DataMembers.ChargeData;
 import Polestar.DataMembers.FuelPrices;
 import Polestar.DataMembers.RangeData;
-import Utils.commonMethods;
+import Utils.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 
-public class Polestar2 extends commonMethods {
+public class Polestar2 extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static final String sliderComponent = "[class='css-1nqf9b0']";
     private static final String startEndSliderId = "[class='css-1nqf9b0']>div>div";

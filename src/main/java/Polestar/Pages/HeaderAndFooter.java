@@ -1,6 +1,6 @@
 package Polestar.Pages;
 
-import Utils.commonMethods;
+import Utils.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 
-public class HeaderAndFooter extends commonMethods {
+public class HeaderAndFooter extends CommonMethods {
 
     private static final Logger LOG = LogManager.getLogger(HeaderAndFooter.class);
     private Map<String, WebElement> mapping = new HashMap<String, WebElement>();

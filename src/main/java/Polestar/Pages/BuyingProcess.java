@@ -1,6 +1,6 @@
 package Polestar.Pages;
 
-import Utils.commonMethods;
+import Utils.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BuyingProcess extends commonMethods {
+public class BuyingProcess extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(BuyingProcess.class);
     private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
     private static final String spacesListSection = "css-1nfgff6";

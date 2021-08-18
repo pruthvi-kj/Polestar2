@@ -19,7 +19,7 @@ import java.util.Date;
 
 import static io.restassured.RestAssured.given;
 
-public class apiCall {
+public class ApiCall {
     public static String baseURL = "https://pc-api-staging.polestar.com";
     private static Response response;
 

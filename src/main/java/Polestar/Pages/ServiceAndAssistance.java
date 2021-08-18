@@ -1,6 +1,6 @@
 package Polestar.Pages;
 
-import Utils.commonMethods;
+import Utils.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceAndAssistance extends commonMethods {
+public class ServiceAndAssistance extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(ServiceAndAssistance.class);
     private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
     private static final String servicePointsListSection = "css-f1w56g";
