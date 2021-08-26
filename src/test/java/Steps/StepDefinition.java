@@ -3,8 +3,11 @@ package Steps;
 import Polestar.DataMembers.ChargeData;
 import Polestar.DataMembers.FuelPrices;
 import Polestar.DataMembers.RangeData;
-import UtilsTest.Utils;
+import UtilsMain.InitiateDriver;
+import UtilsMain.TestInitialization;
+import UtilsMain.TestReport;
 import UtilsTest.ApiCall;
+import UtilsTest.Utils;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -12,23 +15,22 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.asserts.SoftAssert;
-import Utils.TestInitialization;
-import Utils.TestReport;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import static UtilsMain.InitiateDriver.getDriver;
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.testng.Assert.*;
 
@@ -38,9 +40,6 @@ public class StepDefinition extends Utils {
     private final static int batterySize = 78;
     private static final Logger LOG = LogManager.getLogger(StepDefinition.class);
     private ArrayList<String> expectedCallout, actualCallout = new ArrayList<>();
-    private static RemoteWebDriver driver;
-    private static Class<?> cls;
-    private static Object obj;
     private String globalChargingSectionName;
     private static TestReport testReport;
     private List<String> globalExpectedServicePointHeadings;
@@ -56,18 +55,33 @@ public class StepDefinition extends Utils {
     private String globalPageName;
     private String stateName = null;
     private ChargeData chargeData;
-    private List<RangeData> rangeData1;
+    private List<RangeData> rangeData;
+    private static final float singleMotorRange=2.65f;
+    private static final float dualMotorRange=2.49f;
+    private static final int defaultMiles=233;
+    private String motorType;
+    private static final ThreadLocal< Class<?>> clsThread = new ThreadLocal<Class<?>>();
+    private static final ThreadLocal<Object> objThread = new ThreadLocal<>();
+    private static final ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<>();
+    private static final List<String> pagesToVerify =Arrays.asList("BuyingProcess","ElectricDriving","Polestar2", "ServiceAndAssistance");
+    private String globalRoute;
 
-    @Given("User is in {string} page")
-    public void user_is_in_page(String page) {
+
+    @Given("User is in {string} page for {string} route")
+    public void user_is_in_page(String page, String route) {
         try {
             testReport = TestInitialization.getInstance();
-            driver = Hooks.getDriver();
-            driver.get(getURL(page));
-            cls = Class.forName("Polestar.Pages." + page);
+            driverThread.set(getDriver());
+            globalRoute= route;
+            String env=(System.getProperty("environment") == null ? InitiateDriver.defaultEnv : System.getProperty("environment")).toUpperCase();
+            LOG.info("Launching URL"+getURL(page,route));
+            if(env.equalsIgnoreCase("QA"))
+                driverThread.get().get(getValue("AuthUrl"));
+            driverThread.get().get(getURL(page,route));
+            clsThread.set(Class.forName("Polestar.Pages." + page));
             globalPageName = page;
-            Constructor<?> ct = cls.getConstructor(WebDriver.class);
-            obj = ct.newInstance(driver);
+            Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
+            objThread.set(ct.newInstance( driverThread.get()));
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | IOException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -77,7 +91,8 @@ public class StepDefinition extends Utils {
     @When("user navigates to footer")
     public void user_navigates_to_footer() {
         try {
-            callMethod(cls, obj, "navigateToFooter");
+            LOG.info("Calling method navigateToFooter for class  "+ clsThread.get().getName()+" with params"  );
+            callMethod(clsThread.get(), objThread.get(), "navigateToFooter");
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -85,9 +100,11 @@ public class StepDefinition extends Utils {
     }
 
     @When("clicks on {string}")
-    public void clicks_on(String linkName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void clicks_on(String linkName){
+        motorType=linkName;
         try {
-            callMethod(cls, obj, "clickOnTheLink", linkName);
+            LOG.info("Calling method clickOnTheLink for class "+ clsThread.get().getName() + " with params " + linkName );
+            callMethod(clsThread.get(), objThread.get(), "clickOnTheLink", linkName);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -100,7 +117,8 @@ public class StepDefinition extends Utils {
         switch (userPageTitle) {
             case "Select your region":
                 try {
-                    isVisible = (boolean) callMethod(cls, obj, "isElementVisible", userPageTitle);
+                    LOG.info("Calling method isElementVisible for class "+ clsThread.get().getName()+ " with params " + userPageTitle );
+                    isVisible = (boolean) callMethod(clsThread.get(), objThread.get(), "isElementVisible", userPageTitle);
                 } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
                     LOG.error(getLog(e).toString());
                     throw new RuntimeException(e);
@@ -108,36 +126,38 @@ public class StepDefinition extends Utils {
                 assertTrue(isVisible);
                 break;
             case "Careers":
-                waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
-                Set<String> a = driver.getWindowHandles();
+                waitUntilPageTitle( driverThread.get(), userPageTitle.replace("*", "|"));
+                Set<String> a =  driverThread.get().getWindowHandles();
                 int count = 0;
                 for (String handle : a) {
-                    driver.switchTo().window(handle);
-                    if (driver.getTitle().equalsIgnoreCase(userPageTitle.replace("*", "|"))) {
+                    driverThread.get().switchTo().window(handle);
+                    if ( driverThread.get().getTitle().equalsIgnoreCase(userPageTitle.replace("*", "|"))) {
                         count++;
                     }
                 }
                 assertEquals(count, 1, "Title mismatch");
             default:
-                waitUntilPageTitle(driver, userPageTitle.replace("*", "|"));
-                assertEquals(driver.getTitle(), userPageTitle.replace("*", "|"), "Title mismatch");
+                waitUntilPageTitle( driverThread.get(), userPageTitle.replace("*", "|"));
+                assertEquals( driverThread.get().getTitle(), userPageTitle.replace("*", "|"), "Title mismatch");
         }
     }
 
     @Then("when user clicks on back verify that back user lands on Polestar2 homepage")
     public void when_user_clicks_on_back_verify_that_back_user_lands_on_polestar_homepage() {
-        driver.navigate().back();
-        waitUntilPageTitle(driver, polestar2PageTitle);
-        assertEquals(driver.getTitle(), polestar2PageTitle, "Title mismatch");
+        driverThread.get().navigate().back();
+        waitUntilPageTitle( driverThread.get(), polestar2PageTitle);
+        assertEquals( driverThread.get().getTitle(), polestar2PageTitle, "Title mismatch");
     }
 
     @Then("when user clicks on close user lands on Polestar2 homepage")
     public void when_user_clicks_on_close_user_lands_on_polestar_homepage(){
         try {
-            callMethod(cls, obj, "clickOnTheLink", "Close");
+            LOG.info("Calling method clickOnTheLink for class "+ clsThread.get().getName()+ " with params " + "Close" );
+            callMethod(clsThread.get(), objThread.get(), "clickOnTheLink", "Close");
             boolean isVisible;
             Thread.sleep(2000);
-            isVisible = (boolean) callMethod(cls, obj, "isElementVisible", "Select your region");
+            LOG.info("Calling method isElementVisible for class "+ clsThread.get().getName()+ " with params " + "Select your region" );
+            isVisible = (boolean) callMethod(clsThread.get(), objThread.get(), "isElementVisible", "Select your region");
             assertFalse(isVisible, "Elemenst is still visible");
         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InterruptedException e) {
             LOG.error(getLog(e).toString());
@@ -148,7 +168,8 @@ public class StepDefinition extends Utils {
     @When("user navigates to header")
     public void user_navigates_to_header(){
         try {
-            callMethod(cls, obj, "clickOnTheLink", "Header Menu");
+            LOG.info("Calling method clickOnTheLink for class "+ clsThread.get().getName() + " with params " + "Header Menu" );
+            callMethod(clsThread.get(), objThread.get(), "clickOnTheLink", "Header Menu");
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -158,7 +179,8 @@ public class StepDefinition extends Utils {
     @When("user moves the mouse to {string}")
     public void user_moves_the_mouse_to(String Menu){
         try {
-            callMethod(cls, obj, "moveCursorTo", Menu);
+            LOG.info("Calling method moveCursorTo for class "+ clsThread.get().getName() + " with params " + Menu);
+            callMethod(clsThread.get(), objThread.get(), "moveCursorTo", Menu);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -168,7 +190,8 @@ public class StepDefinition extends Utils {
     @When("we read the Web Elements data from excel {string} and sheet {string}")
     public void weReadTheWebElementsDataFromExcelAndSheet(String path, String sheetName){
         try {
-            callMethod(cls, obj, "readData", path, sheetName);
+            LOG.info("Calling method readData for class "+ clsThread.get().getName()+ " with params " + path+", "+ sheetName );
+            callMethod(clsThread.get(), objThread.get(), "readData", path, sheetName);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -178,7 +201,8 @@ public class StepDefinition extends Utils {
     @And("extract the required data")
     public void extractTheRequiredData(){
         try {
-            callMethod(cls, obj, "extractDataOfElements");
+            LOG.info("Calling method extractDataOfElements for class "+ clsThread.get().getName() + " with params " );
+            callMethod(clsThread.get(), objThread.get(), "extractDataOfElements");
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -188,7 +212,8 @@ public class StepDefinition extends Utils {
     @Then("write extracted data to excel {string}")
     public void writeExtractedDataToExcel(String path){
         try {
-            callMethod(cls, obj, "writeData", path);
+            LOG.info("Calling method writeData for class "+ clsThread.get().getName()+ " with params " + path );
+            callMethod(clsThread.get(), objThread.get(), "writeData", path);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -198,7 +223,8 @@ public class StepDefinition extends Utils {
     @And("clicks on {string} option for {string}")
     public void clicksOnOptionFor(String button, String category) {
         try {
-            callMethod(cls, obj, "clickOnButton", category + " " + button);
+            LOG.info("Calling method clickOnButton for class "+ clsThread.get().getName()+ " with params " + category + " " + button );
+            callMethod(clsThread.get(), objThread.get(), "clickOnButton", category + " " + button);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -208,7 +234,8 @@ public class StepDefinition extends Utils {
     @When("user navigates to {string}")
     public void userNavigatesTo(String view){
         try {
-            callMethod(cls, obj, "navigateToView", view);
+            LOG.info("Calling method navigateToView for class "+ clsThread.get().getName()+ " with params " + view );
+            callMethod(clsThread.get(), objThread.get(), "navigateToView", view);
             Thread.sleep(1000);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InterruptedException e) {
             LOG.error(getLog(e).toString());
@@ -216,13 +243,14 @@ public class StepDefinition extends Utils {
         }
         LOG.info("User is in section " + view);
         testReport.log("User is in section " + view);
-        testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+        testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
     }
 
     @Then("Verify the user lands on {string}")
     public void verifyTheUserLandsOn(String section){
         try {
-            assertEquals((String) callMethod(cls, obj, "getViewName", section), section, "Not in the selected view");
+            LOG.info("Calling method getViewName for class "+ clsThread.get().getName()+ " with params " + section );
+            assertEquals((String) callMethod(clsThread.get(), objThread.get(), "getViewName", section), section, "Not in the selected view");
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -232,9 +260,12 @@ public class StepDefinition extends Utils {
     @And("extract all the callout for the section {string}")
     public void extractAllTheCalloutForTheSection(String section){
         try {
-            callMethod(cls, obj, "readData", "src/test/resources/excel.xlsx", section);
-            expectedCallout = (ArrayList<String>) callMethod(cls, obj, "extractCalloutFromExcel");
-            actualCallout = (ArrayList<String>) callMethod(cls, obj, "getTextOfElements", section);
+            LOG.info("Calling method readData for class "+ clsThread.get().getName()+ " with params " +"src/test/resources/excel.xlsx," + section  );
+            callMethod(clsThread.get(), objThread.get(), "readData", "src/test/resources/excel.xlsx", section);
+            LOG.info("Calling method extractCalloutFromExcel for class "+ clsThread.get().getName() + " with params");
+            expectedCallout = (ArrayList<String>) callMethod(clsThread.get(), objThread.get(), "extractCalloutFromExcel");
+            LOG.info("Calling method getTextOfElements for class "+ clsThread.get().getName()+ " with params " + section );
+            actualCallout = (ArrayList<String>) callMethod(clsThread.get(), objThread.get(), "getTextOfElements", section);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -249,7 +280,8 @@ public class StepDefinition extends Utils {
     @And("verify that all the links are valid")
     public void verifyLinkValid() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         try {
-            assertTrue((Boolean) callMethod(cls, obj, "verifyAllLinksAreValid"));
+            LOG.info("Calling method verifyAllLinksAreValid for class "+ clsThread.get().getName()+ " with params " );
+            assertTrue((Boolean) callMethod(clsThread.get(), objThread.get(), "verifyAllLinksAreValid"));
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -263,15 +295,18 @@ public class StepDefinition extends Utils {
         globalActualModals = new ArrayList<>();
         globalExpectedModals.forEach(s -> {
             try {
-                callMethod(cls, obj, "navigateToView", s);
+                LOG.info("Calling method navigateToView for class "+ clsThread.get().getName() + " with params " + s);
+                callMethod(clsThread.get(), objThread.get(), "navigateToView", s);
                 LOG.info("User is in section " + s);
                 testReport.log("User is in section " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-                callMethod(cls, obj, "clickOnLearnMore");
-                globalActualModals.add((String) callMethod(cls, obj, "onModal"));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
+                LOG.info("Calling method clickOnLearnMore for class "+ clsThread.get().getName()+ " with params " );
+                callMethod(clsThread.get(), objThread.get(), "clickOnLearnMore");
+                LOG.info("Calling method onModal for class "+ clsThread.get().getName()+ " with params " );
+                globalActualModals.add((String) callMethod(clsThread.get(), objThread.get(), "onModal"));
                 LOG.info("User is in modal " + globalActualModals.get(globalActualModals.size() - 1));
                 testReport.log("User is in modal " + globalActualModals.get(globalActualModals.size() - 1));
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString());
                 throw new RuntimeException(e);
@@ -285,16 +320,19 @@ public class StepDefinition extends Utils {
         globalActualModals = new ArrayList<>();
         globalExpectedModals.add(sectionName);
         try {
-            callMethod(cls, obj, "navigateToView", sectionName);
+            LOG.info("Calling method navigateToView for class "+ clsThread.get().getName() + " with params " + sectionName);
+            callMethod(clsThread.get(), objThread.get(), "navigateToView", sectionName);
             LOG.info("User is in section " + sectionName);
             testReport.log("User is in section " + sectionName);
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-            callMethod(cls, obj, "clickOnLearnMore");
+            testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
+            LOG.info("Calling method clickOnLearnMore for class "+ clsThread.get().getName()+ " with params " );
+            callMethod(clsThread.get(), objThread.get(), "clickOnLearnMore");
             Thread.sleep(1000);
             LOG.info("User is in modal of " + sectionName);
             testReport.log("User is in modal of " + sectionName);
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-            globalActualModals.add((String) callMethod(cls, obj, "onModal"));
+            testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
+            LOG.info("Calling method onModal for class "+ clsThread.get().getName()+ " with params "  );
+            globalActualModals.add((String) callMethod(clsThread.get(), objThread.get(), "onModal"));
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InterruptedException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -309,7 +347,8 @@ public class StepDefinition extends Utils {
     @Then("Verify that all the tab headings are clickable")
     public void verifyThatAllTheTabHeadingsAreClickable(){
         try {
-            assertTrue((Boolean) callMethod(cls, obj, "ifSectionClickable"), "Unable to click on all the modals");
+            LOG.info("Calling method ifSectionClickable for class "+ clsThread.get().getName()+ " with params " );
+            assertTrue((Boolean) callMethod(clsThread.get(), objThread.get(), "ifSectionClickable"), "Unable to click on all the modals");
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -321,22 +360,25 @@ public class StepDefinition extends Utils {
         globalExpectedModals = feature.asList(String.class);
         globalActualModals = new ArrayList<>();
         try {
-            callMethod(cls, obj, "navigateToView", "Exterior");
+            LOG.info("Calling method navigateToView for class "+ clsThread.get().getName()+ " with params " + "Exterior" );
+            callMethod(clsThread.get(), objThread.get(), "navigateToView", "Exterior");
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
         }
         globalExpectedModals.forEach(s -> {
             try {
-                callMethod(cls, obj, "clickOnSeeMore", s);
+                LOG.info("Calling method clickOnSeeMore for class "+ clsThread.get().getName() + " with params " + s );
+                callMethod(clsThread.get(), objThread.get(), "clickOnSeeMore", s);
                 LOG.info("User clicks on See More under " + s);
                 testReport.log("User clicks on See More under " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
                 Thread.sleep(1000);
-                globalActualModals.add((String) callMethod(cls, obj, "onModal"));
+                LOG.info("Calling method onModal for class "+ clsThread.get().getName()  + " with params " );
+                globalActualModals.add((String) callMethod(clsThread.get(), objThread.get(), "onModal"));
                 LOG.info("User is on modal of " + s);
                 testReport.log("User is on modal of " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InterruptedException e) {
                 LOG.error(getLog(e).toString());
                 throw new RuntimeException(e);            }
@@ -349,7 +391,8 @@ public class StepDefinition extends Utils {
     public void clicksOnSection(String chargingSectionName){
         globalChargingSectionName = chargingSectionName;
         try {
-            callMethod(cls, obj, "getChargingModalSection", chargingSectionName);
+            LOG.info("Calling method getChargingModalSection for class "+ clsThread.get().getName() + " with params " + chargingSectionName  );
+            callMethod(clsThread.get(), objThread.get(), "getChargingModalSection", chargingSectionName);
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -359,7 +402,8 @@ public class StepDefinition extends Utils {
     @And("clicks on {double} kW charger")
     public void clicksOnKWCharger(double powerOutput) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         try {
-            callMethod(cls, obj, "clickOnChargerType", globalChargingSectionName, powerOutput);
+            LOG.info("Calling method clickOnChargerType for class "+ clsThread.get().getName() + " with params " + powerOutput );
+            callMethod(clsThread.get(), objThread.get(), "clickOnChargerType", globalChargingSectionName, powerOutput);
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -369,7 +413,8 @@ public class StepDefinition extends Utils {
     @And("slider positions are set at {int} px and {int} px from current position")
     public void sliderPositionsAreSetAtPxAndPx(int startChargePercentage, int endChargePercentage) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         try {
-            callMethod(cls, obj, "updateSliderPosition", startChargePercentage, endChargePercentage);
+            LOG.info("Calling method updateSliderPosition for class "+ clsThread.get().getName()  + " with params " + startChargePercentage+", "+endChargePercentage);
+            callMethod(clsThread.get(), objThread.get(), "updateSliderPosition", startChargePercentage, endChargePercentage);
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -387,19 +432,22 @@ public class StepDefinition extends Utils {
 
     @And("clicks on {string} tab")
     public void clicksOnTab(String tabName) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        callMethod(cls, obj, "clickOnTabInSavings", tabName, globalChargingSectionName);
+        LOG.info("Calling method clickOnTabInSavings for class "+ clsThread.get().getName() + " with params " + tabName+", "+ globalChargingSectionName );
+        callMethod(clsThread.get(), objThread.get(), "clickOnTabInSavings", tabName, globalChargingSectionName);
     }
 
     @And("user update the slider position")
     public void userSlidesUpto(DataTable slideX) {
         List<Integer> slide = slideX.asList(int.class);
-        rangeData1 = new ArrayList<>();
+        rangeData = new ArrayList<>();
         slide.forEach(s -> {
             try {
-                callMethod(cls, obj, "updateSliderPosition", s);
-                rangeData1.add((RangeData) callMethod(cls, obj, "calculateMiles"));
-                testReport.log("screenshot for miles " + rangeData1.get(rangeData1.size() - 1).miles);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                LOG.info("Calling method updateSliderPosition for class "+ clsThread.get().getName() + " with params " + s  );
+                callMethod(clsThread.get(), objThread.get(), "updateSliderPosition", s);
+                LOG.info("Calling method calculateMiles for class "+ clsThread.get().getName()  + " with params ");
+                rangeData.add((RangeData) callMethod(clsThread.get(), objThread.get(), "calculateMiles"));
+                testReport.log("screenshot for "+motorType+" miles travelled " + rangeData.get(rangeData.size() - 1).miles);
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString());
                 throw new RuntimeException(e);
@@ -410,11 +458,12 @@ public class StepDefinition extends Utils {
     @Then("verify the miles calculated")
     public void verifyTheMilesCalculated() {
         SoftAssert softAssert = new SoftAssert();
-        rangeData1.forEach(s -> {
+        float rangeInMiles= motorType.equalsIgnoreCase("Single Motor")? singleMotorRange:dualMotorRange;
+        rangeData.forEach(s -> {
             float expectedValue;
             if (s.rangePercentage == 100) {
-                expectedValue = ((s.numberOfCharge) * 100 * 2.49f);
-            } else expectedValue = (((s.numberOfCharge - 1) * 100 * 2.49f) + ((100 - s.rangePercentage) * 2.49f));
+                expectedValue = ((s.numberOfCharge) * 100 * rangeInMiles);
+            } else expectedValue = (((s.numberOfCharge - 1) * 100 * rangeInMiles) + ((100 - s.rangePercentage) * rangeInMiles));
             int actualValue = s.miles;
             int expectedRoundValue = (int) (Math.ceil(expectedValue) == actualValue ? Math.ceil(expectedValue) : Math.floor(expectedValue));
             softAssert.assertEquals(actualValue, expectedRoundValue, "Miles do not match");
@@ -430,40 +479,45 @@ public class StepDefinition extends Utils {
     @Then("verify the savings")
     public void verifyTheSavings() {
         SoftAssert softAssert = new SoftAssert();
-        if (rangeData1 == null) {
-            rangeData1 = new ArrayList<>();
-            rangeData1.add(new RangeData());
+        if (rangeData == null) {
+            rangeData = new ArrayList<>();
+            rangeData.add(new RangeData());
         }
-        rangeData1.forEach(rangeData -> {
+        rangeData.forEach(rangeData -> {
             String stateCode = getStateCode(stateName);
             FuelPrices actualSavingsValue = null;
             FuelPrices expectedSavingsValue;
             Long actualSaving = null;
-            double milesToKM = (rangeData.miles == 0 ? 233 : rangeData.miles);
+            double milesToKM = (rangeData.miles == 0 ? defaultMiles : rangeData.miles);
             double km = milesToKM % 10 > 5 ? Math.ceil(milesToKM * 1.609) : Math.floor(milesToKM * 1.609);
             try {
                 if (globalPageName.equalsIgnoreCase("Polestar2")) {
                     if (stateName == null) {
-                        if (rangeData.miles != 0)
-                            callMethod(cls, obj, "navigateToView", "Range");
-
-                        callMethod(cls, obj, "clickOnLearnMore");
-                        callMethod(cls, obj, "getChargingModalSection", "Savings");
+                        if (rangeData.miles != 0) {
+                            LOG.info("Calling method navigateToView for class " + clsThread.get().getName() + " with params " + "Range" );
+                            callMethod(clsThread.get(), objThread.get(), "navigateToView", "Range");
+                        }
+                        LOG.info("Calling method clickOnLearnMore for class "+ clsThread.get().getName() + " with params " );
+                        callMethod(clsThread.get(), objThread.get(), "clickOnLearnMore");
+                        LOG.info("Calling method getChargingModalSection for class "+ clsThread.get().getName() + " with params " + "Savings" );
+                        callMethod(clsThread.get(), objThread.get(), "getChargingModalSection", "Savings");
                     }
 
-                    actualSavingsValue = (FuelPrices) callMethod(cls, obj, "getSavingsValue", "Savings");
+                    LOG.info("Calling method getSavingsValue for class "+ clsThread.get().getName()  + " with params " + "Savings" );
+                    actualSavingsValue = (FuelPrices) callMethod(clsThread.get(), objThread.get(), "getSavingsValue", "Savings");
                     for (Field field : actualSavingsValue.getClass().getDeclaredFields()) {
                         field.setAccessible(true);
                         LOG.info("Actual " + field.getName() + ": " + field.get(actualSavingsValue));
                         testReport.log("Actual " + field.getName() + ": " + field.get(actualSavingsValue));
                     }
                 } else if (globalPageName.equalsIgnoreCase("ElectricDriving")) {
-                    actualSaving = (Long) (callMethod(cls, obj, "getSavingsValue"));
+                    LOG.info("Calling method getSavingsValue for class "+ clsThread.get().getName()  + " with params ");
+                    actualSaving = (Long) (callMethod(clsThread.get(), objThread.get(), "getSavingsValue"));
                     LOG.info("Actual Savings: " + actualSaving);
                     testReport.log("Actual Savings: " + actualSaving);
                 }
                 testReport.log("Savings value calculated");
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
 
                 //getting state code and fuel price
                 FuelPrices price = ApiCall.getFuelPrice(stateCode == null ? "US" : "US_" + stateCode);
@@ -495,11 +549,15 @@ public class StepDefinition extends Utils {
         this.stateName = state;
         try {
             if (!globalPageName.equalsIgnoreCase("ElectricDriving")) {
-                callMethod(cls, obj, "navigateToView", "Range");
-                callMethod(cls, obj, "clickOnLearnMore");
-                callMethod(cls, obj, "getChargingModalSection", "Savings");
+                LOG.info("Calling method navigateToView for class "+ clsThread.get().getName()  + " with params " + "Range");
+                callMethod(clsThread.get(), objThread.get(), "navigateToView", "Range");
+                LOG.info("Calling method clickOnLearnMore for class "+ clsThread.get().getName()  + " with params " );
+                callMethod(clsThread.get(), objThread.get(), "clickOnLearnMore");
+                LOG.info("Calling method getChargingModalSection for class "+ clsThread.get().getName()  + " with params " + "Savings" );
+                callMethod(clsThread.get(), objThread.get(), "getChargingModalSection", "Savings");
             }
-            callMethod(cls, obj, "selectState", state);
+            LOG.info("Calling method selectState for class "+ clsThread.get().getName() + " with params " + state );
+            callMethod(clsThread.get(), objThread.get(), "selectState", state);
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -512,10 +570,11 @@ public class StepDefinition extends Utils {
         globalExpectedSectionName = new ArrayList<>();
         globalActualSectionName.forEach(s -> {
             try {
-                globalExpectedSectionName.add((String) callMethod(cls, obj, "navigateToSectionUsingNavBar", s));
+                LOG.info("Calling method navigateToSectionUsingNavBar for class "+ clsThread.get().getName() + " with params " + s );
+                globalExpectedSectionName.add((String) callMethod(clsThread.get(), objThread.get(), "navigateToSectionUsingNavBar", s));
                 LOG.info("user is in section " + s);
                 testReport.log("user is in section " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
 
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString());
@@ -540,10 +599,11 @@ public class StepDefinition extends Utils {
         globalExpectedSectionName = new ArrayList<>();
         globalActualSectionName.forEach(s -> {
             try {
-                globalExpectedSectionName.add((String) callMethod(cls, obj, "navigateToSectionUsingTabHeading", s));
+                LOG.info("Calling method navigateToSectionUsingTabHeading for class "+ clsThread.get().getName() + " with params " + s  );
+                globalExpectedSectionName.add((String) callMethod(clsThread.get(), objThread.get(), "navigateToSectionUsingTabHeading", s));
                 LOG.info("user is in section " + s);
                 testReport.log("user is in section " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString());
                 throw new RuntimeException(e);
@@ -552,21 +612,23 @@ public class StepDefinition extends Utils {
     }
 
     @When("clicks on service point under {string} section")
-    public void clicksOnServicePointUnderSection(String sectionName, DataTable servicePoints) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public void clicksOnServicePointUnderSection(String sectionName, DataTable servicePoints){
         globalExpectedServicePointHeadings = servicePoints.asList(String.class);
         globalActualServicePointHeadings = new ArrayList<>();
         try {
-            callMethod(cls, obj, "navigateToView", sectionName);
+            LOG.info("Calling method navigateToView for class "+ clsThread.get().getName() + " with params " + sectionName );
+            callMethod(clsThread.get(), objThread.get(), "navigateToView", sectionName);
         }catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
         }
         globalExpectedServicePointHeadings.forEach(s -> {
             try {
-                globalActualServicePointHeadings.add((String) callMethod(cls, obj, "clickOnServicePoint", s));
+                LOG.info("Calling method clickOnServicePoint for class "+ clsThread.get().getName() + " with params " + s  );
+                globalActualServicePointHeadings.add((String) callMethod(clsThread.get(), objThread.get(), "clickOnServicePoint", s));
                 LOG.info("user is in modal for service point " + s);
                 testReport.log("user is in modal for service point " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString());
                 throw new RuntimeException(e);
@@ -589,10 +651,11 @@ public class StepDefinition extends Utils {
         globalActualSpacesHeadings = new ArrayList<>();
         globalExpectedSpacesHeadings.forEach(s -> {
             try {
-                globalActualSpacesHeadings.add((String) callMethod(cls, obj, "clickOnSpace", s));
+                LOG.info("Calling method clickOnSpace for class "+ clsThread.get().getName() + " with params " + s  );
+                globalActualSpacesHeadings.add((String) callMethod(clsThread.get(), objThread.get(), "clickOnSpace", s));
                 LOG.info("user is in modal for space " + s);
                 testReport.log("user is in modal for space " + s);
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOG.error(getLog(e).toString() + " " + e.getClass());
                 throw new RuntimeException(e);
@@ -616,17 +679,21 @@ public class StepDefinition extends Utils {
         actualTimes = new ArrayList<>();
         chargingInfo.forEach(s -> {
             try {
-                callMethod(cls, obj, "getChargingModalSection", s.get("ChargerType"));
+                LOG.info("Calling method getChargingModalSection for class "+ clsThread.get().getName() + " with params " + s.get("Charger Type") );
+                callMethod(clsThread.get(), objThread.get(), "getChargingModalSection", s.get("ChargerType"));
                 LOG.info("user is on section" + s.get("ChargerType"));
                 testReport.log("user is on section" + s.get("ChargerType"));
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-                callMethod(cls, obj, "clickOnChargerType", s.get("ChargerType"), Double.parseDouble(s.get("PowerOutput")));
-                callMethod(cls, obj, "updateSliderPosition", Integer.parseInt(s.get("Start%")), Integer.parseInt(s.get("End%")));
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
+                LOG.info("Calling method clickOnChargerType for class "+ clsThread.get().getName()  + " with params " + s.get("ChargerType")+", " +Double.parseDouble(s.get("PowerOutput")));
+                callMethod(clsThread.get(), objThread.get(), "clickOnChargerType", s.get("ChargerType"), Double.parseDouble(s.get("PowerOutput")));
+                LOG.info("Calling method updateSliderPosition for class "+ clsThread.get().getName()+ " with params " + Integer.parseInt(s.get("Start%"))+", " +Integer.parseInt(s.get("End%")) );
+                callMethod(clsThread.get(), objThread.get(), "updateSliderPosition", Integer.parseInt(s.get("Start%")), Integer.parseInt(s.get("End%")));
                 Thread.sleep(1000);
                 LOG.info("Output for " + s.get("ChargerType"));
                 testReport.log("Output for " + s.get("ChargerType"));
-                testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
-                chargeData = (ChargeData) callMethod(cls, obj, "getChargeDuration");
+                testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
+                LOG.info("Calling method getChargeDuration for class "+ clsThread.get().getName() );
+                chargeData = (ChargeData) callMethod(clsThread.get(), objThread.get(), "getChargeDuration"+ " with params ");
                 double duration = ((batterySize * 0.01) * (chargeData.endChargePercentage - chargeData.startChargePercentage))
                         / (Double.parseDouble(s.get("PowerOutput")) * 0.9);
                 int expectedHours = (int) Math.floor(duration);
@@ -650,14 +717,58 @@ public class StepDefinition extends Utils {
 
     @And("user slides upto {int} px")
     public void userSlidesUptoRangePx(int slideX) {
-        rangeData1 = new ArrayList<>();
+        rangeData = new ArrayList<>();
         try {
-            callMethod(cls, obj, "updateSliderPosition", slideX);
-            rangeData1.add((RangeData) callMethod(cls, obj, "calculateMiles"));
-            testReport.log("screenshot for " + rangeData1.get(0).miles + " miles");
-            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));
+            LOG.info("Calling method updateSliderPosition for class "+ clsThread.get().getName() );
+            callMethod(clsThread.get(), objThread.get(), "updateSliderPosition", slideX);
+            LOG.info("Calling method calculateMiles for class "+ clsThread.get().getName() );
+            rangeData.add((RangeData) callMethod(clsThread.get(), objThread.get(), "calculateMiles"));
+            testReport.log("screenshot for " + rangeData.get(0).miles + " miles");
+            testReport.logImage( driverThread.get().getScreenshotAs(OutputType.BASE64));
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);        }
+    }
+
+    @Given("User navigates to {string} page")
+    public void userNavigatesToPage(String pageName) {
+        user_navigates_to_header();
+        clicks_on("Sign in");
+        try {
+            clsThread.set(Class.forName("Polestar.Pages." + pageName));
+            Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
+            objThread.set(ct.newInstance( driverThread.get()));
+        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            LOG.error(getLog(e).toString());
+            throw new RuntimeException(e);        }
+    }
+
+    @Then("user should be signed in")
+    public void userShouldBeSignedIn() {
+        new WebDriverWait(driverThread.get(),15).until(ExpectedConditions.visibilityOf(driverThread.get()
+                .findElement(By.className("css-yp9swi"))));
+        pagesToVerify.forEach(s->{
+            try {
+                driverThread.get().get(getURL(s,globalRoute));
+                user_navigates_to_header();
+
+//                driverThread.get().findElement("sds")
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    @When("User enters {string}")
+    public void userEnters(String key) {
+        LOG.info("Calling method enterValues for class "+ clsThread.get().getName() );
+        try {
+            LOG.info(key+"- "+ getValue(key.replaceAll("\\s+","")));
+            callMethod(clsThread.get(), objThread.get(), "enterValues", key,getValue(key.replaceAll("\\s+","")));
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
+            LOG.error(getLog(e).toString());
+            throw new RuntimeException(e);
+        }
     }
 }

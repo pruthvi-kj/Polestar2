@@ -75,6 +75,6 @@ Feature: Verify the navigation in Header
 
     @Header @Desktop
     Scenario: Verify the Header links on Polestar 2 homepage for Hamburger Menu
-      Given User is in "HeaderAndFooter" page
+      Given User is in "HeaderAndFooter" page for "US" route
       When user navigates to header
       Then verify that all the links are valid

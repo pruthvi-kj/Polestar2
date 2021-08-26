@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Suite">
- <listeners>
-     
-        
-<!--         <Listener class-name="Listener.ListenerPlugin"/>-->
-
- </listeners>
-
-  <test name="Validating User login">
-    <classes>
-      <class name="Runner.TestRunner"/>
-          </classes>
-      </test>
-      
-   
+<suite name="Suite" parallel="classes" thread-count="2">
+    <listeners>
+        <!--         <Listener class-name="Listener.ListenerPlugin"/>-->
+    </listeners>
+    <test name="Validating User login">
+        <classes>
+            <class name="Runner.TestRunner"/>
+        </classes>
+    </test>
 </suite>

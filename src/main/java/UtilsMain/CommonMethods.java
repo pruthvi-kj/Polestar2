@@ -1,4 +1,4 @@
-package Utils;
+package UtilsMain;
 
 import Polestar.Pages.Polestar2;
 import org.apache.logging.log4j.LogManager;
@@ -24,13 +24,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+
+import static UtilsMain.InitiateDriver.getDriver;
 
 public class CommonMethods {
     private static final Logger LOG = LogManager.getLogger(Polestar2.class);
     private static XSSFWorkbook workbook;
     private static XSSFSheet sheet;
     private static FileInputStream fis;
-    private static WebDriver driver;
 
 
     public static void clickOnElement(WebElement element) {
@@ -145,7 +147,7 @@ public class CommonMethods {
         return connection.getResponseCode();
     }
 
-    public int getColumnIndex(Row firstRow, String a) {
+    public static int getColumnIndex(Row firstRow, String a) {
         Iterator<Cell> cell = firstRow.cellIterator();
         int k = 0;
         while (cell.hasNext()) {
@@ -160,26 +162,67 @@ public class CommonMethods {
         return 0;
     }
 
-    public void writeToCell(Row r, int index, String text) {
+    public static void writeToCell(Row r, int index, String text) {
         r.createCell(index).setCellValue(text);
     }
 
-    public void navigateUsingJSToAnElementEnd(WebDriver driver, WebElement element) throws InterruptedException {
+    public static void navigateUsingJSToAnElementEnd(WebDriver driver, WebElement element) throws InterruptedException {
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView(false);", element);
         Thread.sleep(1000);
     }
 
-    public void navigateUsingJSToAnElementStart(WebDriver driver, WebElement element) throws InterruptedException {
+    public static void navigateUsingJSToAnElementStart(WebDriver driver, WebElement element) throws InterruptedException {
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView(true);", element);
         Thread.sleep(1000);
     }
 
-    public void scrollToElementUsingActionClass(WebDriver driver, WebElement element) {
+    public static void navigateUsingJSToAnElementEnd(WebDriver driver, WebElement element, int xOffset, int yOffset) throws InterruptedException {
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView(false); ", element);
+        Thread.sleep(2000);
+        String arg="window.scrollBy("+xOffset+","+yOffset+")";
+        System.out.println(arg);
+        ((JavascriptExecutor) driver)
+                .executeScript(arg);
+        Thread.sleep(2000);
+    }
+
+    public static void scrollToElementUsingActionClass(WebDriver driver, WebElement element) {
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(element));
         Actions ac = new Actions(driver);
         ac.moveToElement(element).build().perform();
+    }
+
+    public static void scrollToElementUsingActionClass(WebElement element, int xOffset,int yOffset) {
+        new WebDriverWait(getDriver(), 5).until(ExpectedConditions.visibilityOf(element));
+        Actions ac = new Actions(getDriver());
+        ac.moveToElement(element,xOffset,yOffset).build().perform();
+    }
+
+    public static void handleCookie(WebElement acceptCookies, WebElement cookieBar){
+        WebDriver driver= getDriver();
+        driver.switchTo().defaultContent();
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        if (!cookieBar.getAttribute("style").contains("display: none;")) {
+            if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
+                wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
+            while (acceptCookies.isDisplayed())
+                clickOnElementJS(driver, acceptCookies);
+        }
+    }
+
+    public static String getDeviceProperty(String key) throws IOException {
+        Properties prop = new Properties();
+        FileInputStream fis = new FileInputStream("src/test/resources/device.properties");
+        prop.load(fis);
+        return prop.getProperty(key);
+    }
+
+    public static void explicitWait(WebElement element){
+        WebDriverWait wait= new WebDriverWait(getDriver(),3,1000);
     }
 
 }

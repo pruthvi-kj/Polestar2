@@ -1,10 +1,9 @@
 package Polestar.Pages;
 
-import Utils.CommonMethods;
+import UtilsMain.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static UtilsMain.InitiateDriver.getWebDriverWait;
 
 public class BuyingProcess extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(BuyingProcess.class);
@@ -55,36 +56,24 @@ public class BuyingProcess extends CommonMethods {
 
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        driver.switchTo().defaultContent();
-        try {
-            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-            WebDriverWait wait = new WebDriverWait(driver, 3);
-            if (cookieBar.getAttribute("style").equalsIgnoreCase("bottom: 0px;")) {
-                if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
-                    wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
-            while (acceptCookies.isDisplayed())
-                clickOnElementJS(driver, acceptCookies);
-        }
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
-        
+        handleCookie(acceptCookies,cookieBar);
         mapping.put("TAB HEADINGS", tabHeadingView);
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        try{
+        try {
             new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
-            clickOnElement(closeCTA);}
-        catch (Exception e){}
+            clickOnElement(closeCTA);
+        } catch (Exception e) {
+        }
         temp = mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()) : getSectionToNavigate(sections, view, "data-name");
         navigateUsingJSToAnElementStart(driver, temp);
     }
 
     public String navigateToSectionUsingTabHeading(String view) {
-        new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
+        getWebDriverWait().until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
-        new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
+        getWebDriverWait().until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
@@ -93,28 +82,29 @@ public class BuyingProcess extends CommonMethods {
     }
 
     public String clickOnSpace(String spaceName) throws InterruptedException {
-        try{
-          new WebDriverWait(driver, 1).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(closeCTA))).click();
-        }
-        catch (Exception e){
+        try {
+            getWebDriverWait().until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(closeCTA))).click();
+        } catch (Exception e) {
         }
         final String[] modalHeading = new String[1];
-        navigateUsingJSToAnElementEnd(driver,buyingProcessSpacesSection);
-        List<WebElement>ele= spaces.stream().filter(s -> s.getText().equalsIgnoreCase(spaceName)).collect(Collectors.toList());
+        getWebDriverWait().until(ExpectedConditions.visibilityOf(buyingProcessSpacesSection));
+        navigateUsingJSToAnElementEnd(driver, buyingProcessSpacesSection);
+        List<WebElement> ele = spaces.stream().filter(s -> s.getText().equalsIgnoreCase(spaceName)).collect(Collectors.toList());
         ele.forEach(s -> {
-            new WebDriverWait(driver, 1).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
+            getWebDriverWait().until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
             clickOnElementJS(driver, s);
             modalHeading[0] = modalOpen.getAttribute("textContent");
             try {
                 Thread.sleep(2000);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         });
 
         return modalHeading[0];
     }
 
     public String onModal() {
-        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
+        return getWebDriverWait().until(ExpectedConditions.visibilityOf(modalOpen)).getText();
     }
 
     public boolean verifyAllLinksAreValid() throws Exception {
@@ -125,7 +115,7 @@ public class BuyingProcess extends CommonMethods {
             try {
                 linksValid[0] = linksValid[0] && makeUrlConnection(s) == (s.getAttribute(attName).contains("instagram") ? 405 : 200);
             } catch (IOException e) {
-                LOG.error("error in verifyAllLinksAreValid"+e.getCause());
+                LOG.error("error in verifyAllLinksAreValid" + e.getCause());
             }
         });
         return linksValid[0];

@@ -3,12 +3,15 @@ package Polestar.Pages;
 import Polestar.DataMembers.ChargeData;
 import Polestar.DataMembers.FuelPrices;
 import Polestar.DataMembers.RangeData;
-import Utils.CommonMethods;
+import UtilsMain.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.Color;
@@ -21,10 +24,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.NoSuchElementException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
+
+import static UtilsMain.InitiateDriver.getWebDriverWait;
 
 
 public class Polestar2 extends CommonMethods {
@@ -47,6 +50,8 @@ public class Polestar2 extends CommonMethods {
     private Map<String, WebElement> mapping = new HashMap<>();
     @FindBy(xpath = "//button[@class='optanon-allow-all accept-cookies-button']")
     private WebElement acceptCookies;
+    @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
+    private WebElement cookieBar;
     @FindBy(className = "css-1ink1h8")
     private WebElement keyStatsHighlightsAPR;
     @FindBy(className = "css-1ezcku6")
@@ -57,7 +62,7 @@ public class Polestar2 extends CommonMethods {
     private WebElement closeCTA;
     @FindBy(css = "[class*='e1wy6baj5']")
     private WebElement orderNowCta;
-    @FindBy(className = "css-e8sj3j")
+    @FindBy(className = "css-15o5yzr")
     private WebElement heroUnit;
     @FindBy(css = "[class*='e1wy6baj6']")
     private WebElement bookATestDriveHU;
@@ -75,8 +80,6 @@ public class Polestar2 extends CommonMethods {
     private WebElement range;
     @FindBy(css = "div[data-name], section[data-name]")
     private List<WebElement> sections;
-    @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
-    private WebElement cookieBar;
     @FindBy(css = "div[class='css-wkb1an']")
     private WebElement modalOpen;
     @FindBy(className = "css-5eui9h")
@@ -93,7 +96,7 @@ public class Polestar2 extends CommonMethods {
     private WebElement stateSelectionClearBtn;
     @FindBy(className = "css-14fom5l")
     private List<WebElement> navBarIds;
-    @FindBy(className = "css-113edzk")
+    @FindBy(className = "css-1fcqaxu")
     private WebElement navBar;
     @FindBy(className = "css-kqytgu")
     private WebElement selectedNavBar;
@@ -101,27 +104,27 @@ public class Polestar2 extends CommonMethods {
     private List<WebElement> selectedTabBar;
     @FindBy(css = "[class='css-yp9swi'] [href]")
     private List<WebElement> polestar2Links;
+    @FindBy(className = "css-1yk2x4e")
+    private WebElement singleMotorCta;
+    @FindBy(className = "css-1un3fhc")
+    private WebElement dualMotorCta;
+    @FindBy(className = "css-1xr9oeg")
+    private WebElement signInBtn;
+    @FindBy(css = "[class='css-1nlu2c6']")
+    private WebElement headerMenu;
 
 
     public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        driver.switchTo().defaultContent();
-        try {
-            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-            WebDriverWait wait = new WebDriverWait(driver, 3);
-            if (cookieBar.getAttribute("style").equalsIgnoreCase("bottom: 0px;")) {
-                if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
-                    wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
-                while (acceptCookies.isDisplayed())
-                    clickOnElementJS(driver, acceptCookies);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        handleCookie(acceptCookies,cookieBar);
         mapping.put("ORDER NOW", orderNowCta);
         mapping.put("BOOK A TEST DRIVE", bookATestDriveHU);
         mapping.put("RANGE CALCULATOR PDP", rangeCalcComp);
+        mapping.put("SINGLE MOTOR", singleMotorCta);
+        mapping.put("DUAL MOTOR", dualMotorCta);
+        mapping.put("SIGN IN", signInBtn);
+        mapping.put("HEADER MENU", headerMenu);
     }
 
     public void getChargingModalSection(String chargingSectionName) throws InterruptedException {
@@ -193,21 +196,23 @@ public class Polestar2 extends CommonMethods {
                 forEach(s -> clickOnElement(s.findElement(By.cssSelector(learnOrSeeMoreCta))));
     }
 
-    public void clickOnTheLink(String linkText) {
-        clickOnElement(mapping.get(linkText.toUpperCase()));
+    public void clickOnTheLink(String linkText) throws InterruptedException {
+        try {
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }catch (Exception e){
+            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()),0,100);
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }
     }
 
     public void navigateToView(String view) throws InterruptedException {
         try {
-            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
+            getWebDriverWait().until(ExpectedConditions.elementToBeClickable(closeCTA));
             clickOnElement(closeCTA);
         } catch (Exception e) {
         }
-        Wait<RemoteWebDriver> wait = new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofSeconds(1))
-                .ignoring(NoSuchElementException.class);
-        wait.until((Function<WebDriver, WebElement>) driver -> sections.get(10));
+        new WebDriverWait(driver,10,1).until(ExpectedConditions
+        .visibilityOfAllElements(sections));
         temp = getSectionToNavigate(sections, view, "data-name");
         navigateUsingJSToAnElementStart(driver, temp);
     }
@@ -273,7 +278,7 @@ public class Polestar2 extends CommonMethods {
         ArrayList<String> calloutActual = new ArrayList<>();
         List<WebElement> elementToVerify;
         //read data from UI and put it in an array list
-        elementToVerify = driver.findElements(By.xpath("//p[text()='"+ section +"']/../..//p[@data-testid]"));
+        elementToVerify = driver.findElements(By.xpath("//p[text()='" + section + "']/../..//p[@data-testid]"));
         scrollToElementUsingActionClass(driver, elementToVerify.get(0));
         for (WebElement e : elementToVerify) {
             calloutActual.add(e.getText());
@@ -283,7 +288,6 @@ public class Polestar2 extends CommonMethods {
 
     public void updateSliderPosition(int slideX) throws InterruptedException {
         Actions a = new Actions(driver);
-        navigateUsingJSToAnElementEnd(driver, rangeCalcComp);
         int width = range.getRect().getWidth();
         if (slideX <= width) {
             a.clickAndHold(rangeSlider).dragAndDropBy(rangeSlider, slideX, 0).build().perform();
@@ -296,20 +300,20 @@ public class Polestar2 extends CommonMethods {
     }
 
     public String onModal() {
-        String modalName = new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(modalOpen)).getText();
+        String modalName = getWebDriverWait().until(ExpectedConditions.visibilityOf(modalOpen)).getText();
         return modalName;
     }
 
     public boolean ifSectionClickable() {
         for (int i = (modalSections.size() - 1); i >= 0; i--) {
             try {
-                new WebDriverWait(driver, 2).until(ExpectedConditions.elementToBeClickable(modalSections.get(i)));
+                getWebDriverWait().until(ExpectedConditions.elementToBeClickable(modalSections.get(i)));
                 modalSections.get(i).click();
                 Thread.sleep(2000);
                 int finalI = i;
                 selectedTabBar.stream().filter(s -> s.findElement(By.cssSelector("span")).getAttribute("textContent")
                         .equalsIgnoreCase(modalSections.get(finalI).getAttribute("textContent"))).forEach(s ->
-                        new WebDriverWait(driver, 3).until(ExpectedConditions.attributeContains(s, "aria-selected", "true")));
+                        getWebDriverWait().until(ExpectedConditions.attributeContains(s, "aria-selected", "true")));
             } catch (Exception e) {
                 return false;
             }

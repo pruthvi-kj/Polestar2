@@ -1,6 +1,7 @@
 package UtilsTest;
 
 import Polestar.DataMembers.FuelPrices;
+import UtilsMain.InitiateDriver;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -9,10 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -23,23 +21,7 @@ public class Utils {
     private static final double polestar2EnergyConsumption = 0.193;
     private static final double fuelVehicleEnergyConsumption = 0.083;
     private static final double weeksInYear = 52.1775;
-
-
-    public static String getDeviceProperty(String key) throws IOException {
-        Properties prop = new Properties();
-        FileInputStream fis = new FileInputStream("src/test/resources/device.properties");
-        prop.load(fis);
-        return prop.getProperty(key);
-    }
-
-    public static String getURL(String key) throws IOException {
-        Properties prop = new Properties();
-        String readEnv = (System.getProperty("environment") == null ? "PROD" :
-                System.getProperty("environment")).toUpperCase();
-        FileInputStream fis = new FileInputStream("src/test/resources/" + readEnv + ".properties");
-        prop.load(fis);
-        return prop.getProperty(key);
-    }
+    private static final String pathOfProp="src/test/resources/";
 
     public static void waitUntilPageTitle(WebDriver driver, String userPageTitle) {
         WebDriverWait wait = new WebDriverWait(driver, 3);
@@ -139,6 +121,18 @@ public class Utils {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         return sw;
+    }
+
+    public static String getValue(String key) throws IOException {
+        Properties prop = new Properties();
+        String readEnv = (System.getProperty("environment") == null ? InitiateDriver.defaultEnv : System.getProperty("environment")).toUpperCase();
+        FileInputStream fis = new FileInputStream(new File(pathOfProp, readEnv + ".properties").getAbsolutePath());
+        prop.load(fis);
+        return prop.getProperty(key);
+    }
+
+    public static String getURL(String key,String route) throws IOException {
+        return getValue("BaseUrl") + route + EndPoints.valueOf(key).getEndPoint();
     }
 
 }

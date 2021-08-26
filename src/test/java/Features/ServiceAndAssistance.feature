@@ -1,7 +1,7 @@
 Feature: Verify Service And Assistance page
 
   Background: User is relevant page
-    Given User is in "ServiceAndAssistance" page
+    Given User is in "ServiceAndAssistance" page for "US" route
 
   @Desktop @SA
   Scenario: Verify navigation using Tab Headings

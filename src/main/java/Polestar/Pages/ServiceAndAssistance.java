@@ -1,6 +1,6 @@
 package Polestar.Pages;
 
-import Utils.CommonMethods;
+import UtilsMain.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -11,12 +11,13 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static UtilsMain.InitiateDriver.getWebDriverWait;
 
 public class ServiceAndAssistance extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(ServiceAndAssistance.class);
@@ -51,34 +52,25 @@ public class ServiceAndAssistance extends CommonMethods {
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
-        try {
-            ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-            WebDriverWait wait = new WebDriverWait(driver, 3);
-            if (cookieBar.getAttribute("style").equalsIgnoreCase("bottom: 0px;")) {
-                if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
-                    wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
-                while (acceptCookies.isDisplayed())
-                    clickOnElementJS(driver, acceptCookies);
-            }
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
+        handleCookie(acceptCookies,cookieBar);
         mapping.put("TAB HEADINGS", tabHeadingView);
     }
 
     public void navigateToView(String view) throws InterruptedException {
-        try{
-            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
-            clickOnElement(closeCTA);}
-        catch (Exception e){}
+        try {
+            getWebDriverWait().until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);
+        } catch (Exception e) {
+        }
         temp = mapping.containsKey(view.toUpperCase()) ? mapping.get(view.toUpperCase()) : getSectionToNavigate(sections, view, "data-name");
         navigateUsingJSToAnElementStart(driver, temp);
     }
 
     public String navigateToSectionUsingTabHeading(String view) {
-        new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
+        getWebDriverWait().until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(tabHeadings)));
         clickOnElementJS(driver, getSectionToNavigate(tabHeadings, view, "title"));
-        new WebDriverWait(driver, 3).until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
+        getWebDriverWait().until(ExpectedConditions.textToBePresentInElement(sectionNavigatedTo, view));
         return sectionNavigatedTo.getAttribute("textContent");
     }
 
@@ -87,19 +79,21 @@ public class ServiceAndAssistance extends CommonMethods {
     }
 
     public String clickOnServicePoint(String servicePointName) throws InterruptedException {
-        try{
-            new WebDriverWait(driver, 1).until(ExpectedConditions.elementToBeClickable(closeCTA));
-            clickOnElement(closeCTA);}
-        catch (Exception e){}
+        try {
+            getWebDriverWait().until(ExpectedConditions.elementToBeClickable(closeCTA));
+            clickOnElement(closeCTA);
+        } catch (Exception e) {
+        }
         final String[] modalHeading = new String[1];
         navigateUsingJSToAnElementEnd(driver, driver.findElement(By.className(servicePointsListSection)));
 
         servicePoints.stream().filter(s -> s.getText().equalsIgnoreCase(servicePointName)).forEach(s -> {
-            new WebDriverWait(driver, 3).until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
+            getWebDriverWait().until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(s)));
             clickOnElementJS(driver, s);
             try {
                 Thread.sleep(2000);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
             modalHeading[0] = modalOpen.getAttribute("textContent");
         });
         clickOnElement(closeCTA);
@@ -107,8 +101,7 @@ public class ServiceAndAssistance extends CommonMethods {
     }
 
     public String onModal() {
-        System.out.println(modalOpen.getAttribute("textContent"));
-        return new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOf(modalOpen)).getAttribute("textContent");
+        return getWebDriverWait().until(ExpectedConditions.visibilityOf(modalOpen)).getAttribute("textContent");
     }
 
     public boolean verifyAllLinksAreValid() {

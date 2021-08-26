@@ -1,7 +1,7 @@
 Feature: Verify Polestar2 page
 
   Background: User is relevant page
-    Given User is in "Polestar2" page
+    Given User is in "Polestar2" page for "US" route
 
 ##  @Desktop
 ##  Scenario: Verify the font size, colour, text and style of any web element
@@ -41,6 +41,16 @@ Feature: Verify Polestar2 page
   @Desktop @PS2
   Scenario: Verify the range calculator
     When user navigates to "Range"
+    And clicks on "Dual motor"
+    And user update the slider position
+      | 20 |
+      | 60 |
+    Then verify the miles calculated
+
+  @Desktop @PS2 @MOTOR
+  Scenario: Verify the range calculator
+    When user navigates to "Range"
+    And clicks on "Single motor"
     And user update the slider position
       | 20 |
       | 60 |

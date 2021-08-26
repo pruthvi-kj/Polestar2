@@ -73,13 +73,13 @@ Feature: Verify the navigation in Footer
 #
 @Desktop @Footer
 Scenario: Verify footer links
-Given User is in "HeaderAndFooter" page
+Given User is in "HeaderAndFooter" page for "US" route
 When user navigates to footer
 Then verify that all the links are valid
 
   @Footer @Desktop
   Scenario: Verify the Change Location link from Polestar 2 homepage footer
-    Given User is in "HeaderAndFooter" page
+    Given User is in "HeaderAndFooter" page for "US" route
     When user navigates to footer
     And clicks on "Change Location"
     Then Verify the user navigates to "Select your region"

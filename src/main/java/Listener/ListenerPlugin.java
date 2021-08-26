@@ -1,36 +1,38 @@
 package Listener;
 
 
-import Steps.Hooks;
+import UtilsMain.TestInitialization;
+import UtilsMain.TestReport;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import Utils.TestInitialization;
-import Utils.TestReport;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static UtilsMain.InitiateDriver.closeDriver;
+import static UtilsMain.InitiateDriver.getDriver;
+
 
 public class ListenerPlugin implements ConcurrentEventListener {
 
     private static final Logger LOG = LogManager.getLogger(ListenerPlugin.class);
-    private static final TestReport testReport = new TestReport();
+    private static final TestReport testReport=new TestReport();
 
-    public void onTestRunStarted(TestRunStarted testRunStarted) {
+    public synchronized void onTestRunStarted(TestRunStarted testRunStarted) {
         TestInitialization.init();
         System.out.flush();
         LOG.info(String.format("Test run started at: %s", LocalDateTime.now()));
     }
 
-    public void onTestCaseStarted(TestCaseStarted testCaseStarted) {
+    public synchronized void onTestCaseStarted(TestCaseStarted testCaseStarted) {
         String testClass = Paths.get(testCaseStarted.getTestCase().getUri()).getFileName().toString();
         String testName = testCaseStarted.getTestCase().getName();
         LOG.info(String.format("Test case started: %s", testName));
-        testReport.createTest(testClass, testName);
+        testReport.createTest(testClass,testName);
     }
 
     public void onTestCaseFinished(TestCaseFinished testCaseFinished) {
@@ -38,14 +40,14 @@ public class ListenerPlugin implements ConcurrentEventListener {
     }
 
     public void onTestRunFinished(TestRunFinished testRunFinished) {
-        Hooks.closeDriver();
+        closeDriver();
         TestReport.closeThreadLocalCollections();
     }
 
     public void onTestStepFinished(TestStepFinished testStepFinished) {
         List<String> tags = testStepFinished.getTestCase().getTags();
 
-        RemoteWebDriver driver = (RemoteWebDriver) Hooks.getDriver();
+        RemoteWebDriver driver = (RemoteWebDriver) getDriver();
 //        if (driver != null && driver.getSessionId() != null) {
 //            testReport.log(testStepFinished.getTestStep().getCodeLocation());
 //            testReport.logImage(driver.getScreenshotAs(OutputType.BASE64));

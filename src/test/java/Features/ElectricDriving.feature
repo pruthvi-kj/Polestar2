@@ -1,7 +1,7 @@
 Feature: Verify Electric Driving page
 
   Background: User is in the relevant page
-    Given User is in "ElectricDriving" page
+    Given User is in "ElectricDriving" page for "US" route
 
   @Desktop @ED
   Scenario: Verify navigation using Tab Headings
