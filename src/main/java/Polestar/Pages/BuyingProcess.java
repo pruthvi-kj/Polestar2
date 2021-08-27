@@ -51,13 +51,17 @@ public class BuyingProcess extends CommonMethods {
     private WebElement closeCTA;
     @FindBy(className = "css-1nfgff6")
     private WebElement buyingProcessSpacesSection;
+    @FindBy(css = "[class='css-1nlu2c6']")
+    private WebElement headerMenu;
 
     public BuyingProcess(WebDriver driver) {
 
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        handleCookie(acceptCookies,cookieBar);
+        handleCookie(acceptCookies, cookieBar);
         mapping.put("TAB HEADINGS", tabHeadingView);
+        mapping.put("HEADER MENU", headerMenu);
+
     }
 
     public void navigateToView(String view) throws InterruptedException {
@@ -119,6 +123,15 @@ public class BuyingProcess extends CommonMethods {
             }
         });
         return linksValid[0];
+    }
+
+    public void clickOnTheLink(String linkText) throws InterruptedException {
+        try {
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        } catch (Exception e) {
+            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()), 0, 100);
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }
     }
 }
 

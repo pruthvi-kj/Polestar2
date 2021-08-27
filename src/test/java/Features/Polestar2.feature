@@ -109,8 +109,8 @@ Feature: Verify Polestar2 page
     And selects "<State>" as the state
     Then verify the savings
     Examples:
-      | State      |
-      | Arizona    |
+      | State   |
+      | Arizona |
 
   @Desktop @PS2
   Scenario: Verify navigation to sections using nav bar

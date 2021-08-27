@@ -46,6 +46,8 @@ public class ServiceAndAssistance extends CommonMethods {
     private List<WebElement> servicePoints;
     @FindBy(css = "[class='css-yp9swi'] [href]")
     private List<WebElement> serviceAndAssistanceLinks;
+    @FindBy(css = "[class='css-1nlu2c6']")
+    private WebElement headerMenu;
 
     public ServiceAndAssistance(WebDriver driver) throws InterruptedException {
 
@@ -53,8 +55,10 @@ public class ServiceAndAssistance extends CommonMethods {
         PageFactory.initElements(driver, this);
         driver.switchTo().defaultContent();
         ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
-        handleCookie(acceptCookies,cookieBar);
+        handleCookie(acceptCookies, cookieBar);
         mapping.put("TAB HEADINGS", tabHeadingView);
+        mapping.put("HEADER MENU", headerMenu);
+
     }
 
     public void navigateToView(String view) throws InterruptedException {
@@ -118,5 +122,12 @@ public class ServiceAndAssistance extends CommonMethods {
         return linksValid[0];
     }
 
-
+    public void clickOnTheLink(String linkText) throws InterruptedException {
+        try {
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        } catch (Exception e) {
+            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()), 0, 100);
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }
+    }
 }

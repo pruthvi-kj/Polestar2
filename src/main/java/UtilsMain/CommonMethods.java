@@ -138,6 +138,7 @@ public class CommonMethods {
         LOG.info("CTA- " + element.getAttribute("textContent") + ", URL- " + element.getAttribute(attName) + ", Response Code- " + connection.getResponseCode() + connection.getResponseMessage());
         return connection.getResponseCode();
     }
+
     public static int makeUrlConnection(String element) throws IOException {
         String attName = "href";
         HttpURLConnection connection = (HttpURLConnection) new URL(element).openConnection();
@@ -182,7 +183,7 @@ public class CommonMethods {
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView(false); ", element);
         Thread.sleep(2000);
-        String arg="window.scrollBy("+xOffset+","+yOffset+")";
+        String arg = "window.scrollBy(" + xOffset + "," + yOffset + ")";
         System.out.println(arg);
         ((JavascriptExecutor) driver)
                 .executeScript(arg);
@@ -195,14 +196,14 @@ public class CommonMethods {
         ac.moveToElement(element).build().perform();
     }
 
-    public static void scrollToElementUsingActionClass(WebElement element, int xOffset,int yOffset) {
+    public static void scrollToElementUsingActionClass(WebElement element, int xOffset, int yOffset) {
         new WebDriverWait(getDriver(), 5).until(ExpectedConditions.visibilityOf(element));
         Actions ac = new Actions(getDriver());
-        ac.moveToElement(element,xOffset,yOffset).build().perform();
+        ac.moveToElement(element, xOffset, yOffset).build().perform();
     }
 
-    public static void handleCookie(WebElement acceptCookies, WebElement cookieBar){
-        WebDriver driver= getDriver();
+    public static void handleCookie(WebElement acceptCookies, WebElement cookieBar) {
+        WebDriver driver = getDriver();
         driver.switchTo().defaultContent();
         ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
         WebDriverWait wait = new WebDriverWait(driver, 5);
@@ -221,8 +222,8 @@ public class CommonMethods {
         return prop.getProperty(key);
     }
 
-    public static void explicitWait(WebElement element){
-        WebDriverWait wait= new WebDriverWait(getDriver(),3,1000);
+    public static void explicitWait(WebElement element) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), 3, 1000);
     }
 
 }

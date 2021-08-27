@@ -117,7 +117,7 @@ public class Polestar2 extends CommonMethods {
     public Polestar2(WebDriver driver) throws InterruptedException {
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        handleCookie(acceptCookies,cookieBar);
+        handleCookie(acceptCookies, cookieBar);
         mapping.put("ORDER NOW", orderNowCta);
         mapping.put("BOOK A TEST DRIVE", bookATestDriveHU);
         mapping.put("RANGE CALCULATOR PDP", rangeCalcComp);
@@ -199,8 +199,8 @@ public class Polestar2 extends CommonMethods {
     public void clickOnTheLink(String linkText) throws InterruptedException {
         try {
             clickOnElement(mapping.get(linkText.toUpperCase()));
-        }catch (Exception e){
-            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()),0,100);
+        } catch (Exception e) {
+            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()), 0, 100);
             clickOnElement(mapping.get(linkText.toUpperCase()));
         }
     }
@@ -211,8 +211,8 @@ public class Polestar2 extends CommonMethods {
             clickOnElement(closeCTA);
         } catch (Exception e) {
         }
-        new WebDriverWait(driver,10,1).until(ExpectedConditions
-        .visibilityOfAllElements(sections));
+        new WebDriverWait(driver, 10, 1).until(ExpectedConditions
+                .visibilityOfAllElements(sections));
         temp = getSectionToNavigate(sections, view, "data-name");
         navigateUsingJSToAnElementStart(driver, temp);
     }

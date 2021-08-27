@@ -17,15 +17,16 @@ import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import static UtilsTest.Utils.getValue;
 import static io.restassured.RestAssured.given;
 
 public class ApiCall {
-    public static String baseURL = "https://pc-api-staging.polestar.com";
+
     private static Response response;
 
     public static FuelPrices getFuelPrice(String stateCode) throws IOException {
         PrintStream stream = new PrintStream(FileUtils.openOutputStream(new File("TestResults/log" + new Timestamp(new Date().getTime()) + ".txt")));
-        RequestSpecification reqSpec = new RequestSpecBuilder().setBaseUri(baseURL)
+        RequestSpecification reqSpec = new RequestSpecBuilder().setBaseUri(getValue("RetrieveFuelPriceBaseUrl"))
                 .addQueryParam("query", "query GetFuelById($fuelId: String!, $electricityId: String!) {  getFuelById(id: $fuelId) {    id    diesel {      date      price      __typename    }    gasoline {      date      price      __typename    }    __typename  }  getElectricityById(id: $electricityId) {    id    average    __typename  }}")
                 .addQueryParam("operationName", "GetFuelById")
                 .addFilter(RequestLoggingFilter.logRequestTo(stream))

@@ -7,10 +7,12 @@ public enum EndPoints {
     BuyingProcess("/buying-process");
 
     private String endPoint;
-    EndPoints(String resource){
-        this.endPoint=resource;
+
+    EndPoints(String resource) {
+        this.endPoint = resource;
     }
-    public String getEndPoint(){
+
+    public String getEndPoint() {
         return endPoint;
     }
 

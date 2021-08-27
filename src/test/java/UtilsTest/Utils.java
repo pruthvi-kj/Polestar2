@@ -21,7 +21,8 @@ public class Utils {
     private static final double polestar2EnergyConsumption = 0.193;
     private static final double fuelVehicleEnergyConsumption = 0.083;
     private static final double weeksInYear = 52.1775;
-    private static final String pathOfProp="src/test/resources/";
+    private static final String pathOfProp = "src/test/resources/";
+    private static String globalReadEnv;
 
     public static void waitUntilPageTitle(WebDriver driver, String userPageTitle) {
         WebDriverWait wait = new WebDriverWait(driver, 3);
@@ -116,7 +117,7 @@ public class Utils {
         return fp;
     }
 
-    public static StringWriter getLog(Exception e){
+    public static StringWriter getLog(Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
@@ -131,7 +132,9 @@ public class Utils {
         return prop.getProperty(key);
     }
 
-    public static String getURL(String key,String route) throws IOException {
+
+
+    public static String getURL(String key, String route) throws IOException {
         return getValue("BaseUrl") + route + EndPoints.valueOf(key).getEndPoint();
     }
 

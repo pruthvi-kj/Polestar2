@@ -21,7 +21,7 @@ public class InitiateDriver {
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
     private static RemoteWebDriver driver, desktopDriver, mobileDriver;
     private static WebDriverWait wait;
-    public static final String defaultEnv="QA";
+    public static final String defaultEnv = "QA";
 
 
     public static void openMobileBrowser() throws IOException {
@@ -65,7 +65,7 @@ public class InitiateDriver {
             // within the group.
             capabilities.setCapability("groupId", 2016); // Group: Team-Polestar
             capabilities.setCapability("deviceGroup", "KOBITON");
-                mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
+            mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
             mobileDriver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
         }
         driver = mobileDriver;
@@ -82,8 +82,8 @@ public class InitiateDriver {
                     ChromeOptions options = new ChromeOptions();
 //                    options.addArguments("--headless");
 //                    options.addArguments("window-size=1920,1080");
-                    options.addArguments("user-data-dir=target/ChromeData");
-                        desktopDriver = new ChromeDriver(options);
+//                    options.addArguments("user-data-dir=target/ChromeData");
+                    desktopDriver = new ChromeDriver(options);
                     break;
                 case "firefox":
                     WebDriverManager.firefoxdriver().setup();
@@ -91,10 +91,10 @@ public class InitiateDriver {
                     firefoxBinary.addCommandLineOptions("--headless");
                     FirefoxOptions firefoxOptions = new FirefoxOptions();
                     firefoxOptions.setBinary(firefoxBinary);
-                        desktopDriver = new FirefoxDriver(firefoxOptions);
+                    desktopDriver = new FirefoxDriver(firefoxOptions);
                     break;
                 case "safari":
-                        desktopDriver = new SafariDriver();
+                    desktopDriver = new SafariDriver();
                     break;
                 //                  *ipad using chrome emulation(to be added if needed)*
 //            case "ipad":
@@ -119,11 +119,10 @@ public class InitiateDriver {
 
     public static void closeDriver() {
         localDrivers.remove();
-        if(desktopDriver!=null) {
+        if (desktopDriver != null) {
             desktopDriver.close();
             desktopDriver.quit();
-        }
-        else {
+        } else {
             mobileDriver.close();
             mobileDriver.quit();
         }
@@ -131,11 +130,11 @@ public class InitiateDriver {
         mobileDriver = null;
     }
 
-    public static void explicitWait(){
-            wait= new WebDriverWait(getDriver(),2,1000);
+    public static void explicitWait() {
+        wait = new WebDriverWait(getDriver(), 2, 1000);
     }
 
-    public static WebDriverWait getWebDriverWait(){
+    public static WebDriverWait getWebDriverWait() {
         return wait;
     }
 

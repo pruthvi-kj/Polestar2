@@ -1,5 +1,6 @@
 package Polestar.ServicePointsPojo;
 
+
 import java.util.List;
 
 public class ServicePoints {

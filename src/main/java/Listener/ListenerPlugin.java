@@ -20,7 +20,7 @@ import static UtilsMain.InitiateDriver.getDriver;
 public class ListenerPlugin implements ConcurrentEventListener {
 
     private static final Logger LOG = LogManager.getLogger(ListenerPlugin.class);
-    private static final TestReport testReport=new TestReport();
+    private static final TestReport testReport = new TestReport();
 
     public synchronized void onTestRunStarted(TestRunStarted testRunStarted) {
         TestInitialization.init();
@@ -32,7 +32,7 @@ public class ListenerPlugin implements ConcurrentEventListener {
         String testClass = Paths.get(testCaseStarted.getTestCase().getUri()).getFileName().toString();
         String testName = testCaseStarted.getTestCase().getName();
         LOG.info(String.format("Test case started: %s", testName));
-        testReport.createTest(testClass,testName);
+        testReport.createTest(testClass, testName);
     }
 
     public void onTestCaseFinished(TestCaseFinished testCaseFinished) {

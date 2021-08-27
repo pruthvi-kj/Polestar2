@@ -5,7 +5,10 @@ import Polestar.DataMembers.RangeData;
 import UtilsMain.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -81,13 +84,17 @@ public class ElectricDriving extends CommonMethods {
     private WebElement stateNameId;
     @FindBy(className = "css-18rtpmq")
     private WebElement stateSelectionClearBtn;
+    @FindBy(css = "[class='css-1nlu2c6']")
+    private WebElement headerMenu;
 
     public ElectricDriving(WebDriver driver) {
 
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        handleCookie(acceptCookies,cookieBar);
+        handleCookie(acceptCookies, cookieBar);
         mapping.put("TAB HEADINGS", tabHeadingView);
+        mapping.put("HEADER MENU", headerMenu);
+
     }
 
     public void navigateToView(String view) throws InterruptedException {
@@ -186,6 +193,15 @@ public class ElectricDriving extends CommonMethods {
             }
         });
         return linksValid.get();
+    }
+
+    public void clickOnTheLink(String linkText) throws InterruptedException {
+        try {
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        } catch (Exception e) {
+            navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()), 0, 100);
+            clickOnElement(mapping.get(linkText.toUpperCase()));
+        }
     }
 }
 

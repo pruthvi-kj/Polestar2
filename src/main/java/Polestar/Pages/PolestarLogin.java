@@ -15,15 +15,15 @@ import static UtilsMain.CommonMethods.clickOnElement;
 
 public class PolestarLogin {
     private static RemoteWebDriver driver;
-    private Map<String, WebElement> mapping= new HashMap<>();
+    private Map<String, WebElement> mapping = new HashMap<>();
 
     public PolestarLogin(WebDriver driver) throws InterruptedException {
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        new WebDriverWait(driver,10,1).until(ExpectedConditions.visibilityOf(loginForm));
+        new WebDriverWait(driver, 15, 1).until(ExpectedConditions.visibilityOf(loginForm));
         mapping.put("EMAIL ADDRESS", emailAddressInput);
         mapping.put("PASSWORD", passwordInput);
-        mapping.put("LOGIN",loginBtn);
+        mapping.put("LOGIN", loginBtn);
 
 
     }
@@ -40,13 +40,24 @@ public class PolestarLogin {
     private WebElement passwordInput;
     @FindBy(id = "login-btn")
     private WebElement loginBtn;
+    @FindBy(className = "css-yp9swi")
+    private WebElement loggedInHomeScreen;
 
     public void enterValues(String key, String value) throws InterruptedException {
         mapping.get(key.toUpperCase()).sendKeys(value);
     }
 
     public void clickOnTheLink(String element) throws InterruptedException {
-            clickOnElement(mapping.get(element.toUpperCase()));
+        clickOnElement(mapping.get(element.toUpperCase()));
+    }
+
+    public boolean ifUserLoggedIn() {
+        try {
+            new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(loggedInHomeScreen));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }

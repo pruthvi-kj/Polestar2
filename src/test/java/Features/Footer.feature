@@ -71,11 +71,11 @@ Feature: Verify the navigation in Footer
 #      | Social       | Subscribe          | Newsletter sign up                                             |
 #
 #
-@Desktop @Footer
-Scenario: Verify footer links
-Given User is in "HeaderAndFooter" page for "US" route
-When user navigates to footer
-Then verify that all the links are valid
+  @Desktop @Footer
+  Scenario: Verify footer links
+    Given User is in "HeaderAndFooter" page for "US" route
+    When user navigates to footer
+    Then verify that all the links are valid
 
   @Footer @Desktop
   Scenario: Verify the Change Location link from Polestar 2 homepage footer

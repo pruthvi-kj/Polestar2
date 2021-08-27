@@ -19,7 +19,7 @@ public class Hooks extends Utils {
 
 
     @Before
-    public static void beforeMethod(Scenario scenario){
+    public static void beforeMethod(Scenario scenario) {
         List<String> tags = new ArrayList<>(scenario.getSourceTagNames());
         try {
             if (tags.contains("@Desktop")) {
@@ -27,7 +27,7 @@ public class Hooks extends Utils {
             } else {
                 openMobileBrowser();
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             LOG.error(e.getCause());
             throw new RuntimeException(e);
         }
