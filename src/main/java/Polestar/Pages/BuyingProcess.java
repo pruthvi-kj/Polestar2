@@ -23,7 +23,6 @@ import static UtilsMain.InitiateDriver.getWebDriverWait;
 public class BuyingProcess extends CommonMethods {
     private static final Logger LOG = LogManager.getLogger(BuyingProcess.class);
     private static final String learnOrSeeMoreCta = "div[class='css-ly8tcg']";
-    private static final String spacesListSection = "css-1nfgff6";
     private static WebElement temp;
 
     private static RemoteWebDriver driver;

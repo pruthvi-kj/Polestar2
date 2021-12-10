@@ -1,17 +1,13 @@
 package Polestar.Pages;
 
-import Polestar.DataMembers.ChargeData;
-import Polestar.DataMembers.FuelPrices;
+import Polestar.DataMembers.*;
 import Polestar.DataMembers.RangeData;
 import UtilsMain.CommonMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.Color;
@@ -25,6 +21,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static UtilsMain.InitiateDriver.getWebDriverWait;
@@ -108,7 +105,7 @@ public class Polestar2 extends CommonMethods {
     private WebElement singleMotorCta;
     @FindBy(className = "css-1un3fhc")
     private WebElement dualMotorCta;
-    @FindBy(className = "css-1xr9oeg")
+    @FindBy(css = ".css-1xr9oeg, .css-1g9r2h5 .css-15kwtnw, .css-1xr9oeg .css-seexg4")
     private WebElement signInBtn;
     @FindBy(css = "[class='css-1nlu2c6']")
     private WebElement headerMenu;
@@ -198,6 +195,7 @@ public class Polestar2 extends CommonMethods {
 
     public void clickOnTheLink(String linkText) throws InterruptedException {
         try {
+            getWebDriverWait().until(ExpectedConditions.elementToBeClickable(mapping.get(linkText.toUpperCase())));
             clickOnElement(mapping.get(linkText.toUpperCase()));
         } catch (Exception e) {
             navigateUsingJSToAnElementEnd(driver, mapping.get(linkText.toUpperCase()), 0, 100);

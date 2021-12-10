@@ -1,6 +1,5 @@
 package UtilsMain;
 
-import Polestar.Pages.Polestar2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -29,7 +28,7 @@ import java.util.Properties;
 import static UtilsMain.InitiateDriver.getDriver;
 
 public class CommonMethods {
-    private static final Logger LOG = LogManager.getLogger(Polestar2.class);
+    private static final Logger LOG = LogManager.getLogger(CommonMethods.class);
     private static XSSFWorkbook workbook;
     private static XSSFSheet sheet;
     private static FileInputStream fis;
@@ -203,15 +202,17 @@ public class CommonMethods {
     }
 
     public static void handleCookie(WebElement acceptCookies, WebElement cookieBar) {
+        LOG.info("Identifying if the cookie bar to be handled");
         WebDriver driver = getDriver();
         driver.switchTo().defaultContent();
-        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
         WebDriverWait wait = new WebDriverWait(driver, 5);
+        LOG.info(cookieBar.getAttribute("style"));
         if (!cookieBar.getAttribute("style").contains("display: none;")) {
-            if (wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed())
+            LOG.info("handling cookies bar");
+                wait.until(ExpectedConditions.visibilityOf(cookieBar)).isDisplayed();
                 wait.until(ExpectedConditions.elementToBeClickable(acceptCookies));
             while (acceptCookies.isDisplayed())
-                clickOnElementJS(driver, acceptCookies);
+                clickOnElement(acceptCookies);
         }
     }
 

@@ -13,9 +13,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static UtilsMain.CommonMethods.getDeviceProperty;
+
 
 public class InitiateDriver {
     private static final ThreadLocal<RemoteWebDriver> localDrivers = new ThreadLocal<>();
@@ -66,7 +67,7 @@ public class InitiateDriver {
             capabilities.setCapability("groupId", 2016); // Group: Team-Polestar
             capabilities.setCapability("deviceGroup", "KOBITON");
             mobileDriver = new RemoteWebDriver(new URL(kobitonServerUrl), capabilities);
-            mobileDriver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+            mobileDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         }
         driver = mobileDriver;
         localDrivers.set(driver);
@@ -82,7 +83,7 @@ public class InitiateDriver {
                     ChromeOptions options = new ChromeOptions();
 //                    options.addArguments("--headless");
 //                    options.addArguments("window-size=1920,1080");
-//                    options.addArguments("user-data-dir=target/ChromeData");
+                    options.addArguments("user-data-dir=target/ChromeData");
                     desktopDriver = new ChromeDriver(options);
                     break;
                 case "firefox":
@@ -106,7 +107,7 @@ public class InitiateDriver {
 //
 //                desktopDriver = new ChromeDriver(chromeOptions);
             }
-            desktopDriver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+            desktopDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
             desktopDriver.manage().window().maximize();
         }
         driver = desktopDriver;

@@ -13,17 +13,15 @@ import java.util.Map;
 
 import static UtilsMain.CommonMethods.clickOnElement;
 
-public class PolestarLogin {
+public class PolestarProfile {
+
     private static RemoteWebDriver driver;
     private Map<String, WebElement> mapping = new HashMap<>();
 
-    public PolestarLogin(WebDriver driver) throws InterruptedException {
+    public PolestarProfile(WebDriver driver) throws InterruptedException {
         this.driver = (RemoteWebDriver) driver;
         PageFactory.initElements(driver, this);
-        new WebDriverWait(driver, 15, 1).until(ExpectedConditions.visibilityOf(loginForm));
-        mapping.put("EMAIL ADDRESS", emailAddressInput);
-        mapping.put("PASSWORD", passwordInput);
-        mapping.put("LOGIN", loginBtn);
+        new WebDriverWait(driver, 15, 1).until(ExpectedConditions.visibilityOf(loggedInHomeScreen));
         mapping.put("LOG OUT",logoutBtn);
     }
 
@@ -31,14 +29,7 @@ public class PolestarLogin {
     private WebElement acceptCookies;
     @FindBy(css = "div[class*='optanon-alert-box-wrapper']")
     private WebElement cookieBar;
-    @FindBy(className = "main-container")
-    private WebElement loginForm;
-    @FindBy(id = "email-username-field")
-    private WebElement emailAddressInput;
-    @FindBy(id = "password-field")
-    private WebElement passwordInput;
-    @FindBy(id = "login-btn")
-    private WebElement loginBtn;
+
     @FindBy(className = "css-yp9swi")
     private WebElement loggedInHomeScreen;
     @FindBy(className = "css-1dfa8nz")
@@ -50,5 +41,14 @@ public class PolestarLogin {
 
     public void clickOnTheLink(String element) throws InterruptedException {
         clickOnElement(mapping.get(element.toUpperCase()));
+    }
+
+    public boolean ifUserLoggedIn() {
+        try {
+            new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(loggedInHomeScreen));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

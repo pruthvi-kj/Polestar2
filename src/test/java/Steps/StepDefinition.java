@@ -1,13 +1,12 @@
 package Steps;
 
-import Polestar.DataMembers.ChargeData;
-import Polestar.DataMembers.FuelPrices;
+import Constant.*;
+import Polestar.DataMembers.*;
 import Polestar.DataMembers.RangeData;
 import UtilsMain.InitiateDriver;
-import UtilsMain.TestInitialization;
-import UtilsMain.TestReport;
-import UtilsTest.ApiCall;
-import UtilsTest.Utils;
+import UtilsMain.*;
+import UtilsTest.*;
+
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -16,9 +15,12 @@ import io.cucumber.java.en.When;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.asserts.SoftAssert;
 
 import java.io.IOException;
@@ -26,7 +28,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static UtilsMain.InitiateDriver.getDriver;
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
@@ -35,7 +40,6 @@ import static org.testng.Assert.*;
 
 public class StepDefinition extends Utils {
     final private static String polestar2PageTitle = "Polestar 2 – The 100% electric car | Polestar US";
-    private final static int batterySize = 78;
     private static final Logger LOG = LogManager.getLogger(StepDefinition.class);
     private ArrayList<String> expectedCallout, actualCallout = new ArrayList<>();
     private String globalChargingSectionName;
@@ -54,33 +58,31 @@ public class StepDefinition extends Utils {
     private String stateName = null;
     private ChargeData chargeData;
     private List<RangeData> rangeData;
-    private static final float singleMotorRange = 2.65f;
-    private static final float dualMotorRange = 2.49f;
-    private static final int defaultMiles = 233;
     private String motorType;
     private static final ThreadLocal<Class<?>> clsThread = new ThreadLocal<Class<?>>();
     private static final ThreadLocal<Object> objThread = new ThreadLocal<>();
     private static final ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<>();
-    private static final List<String> pagesToVerify = Arrays.asList("BuyingProcess", "ElectricDriving", "Polestar2", "ServiceAndAssistance");
     private String globalRoute;
-    private static final By userLoggedIn = By.cssSelector(".css-1g9r2h5 .css-15kwtnw");
+    private static final By userLoggedIn = By.cssSelector(".css-1g9r2h5 .css-15kwtnw, .css-1xr9oeg .css-seexg4");
 
 
     @Given("User is in {string} page for {string} route")
     public void user_is_in_page(String page, String route) {
         try {
+            globalRoute = route;
+            globalPageName = page;
             testReport = TestInitialization.getInstance();
             driverThread.set(getDriver());
-            globalRoute = route;
             String env = (System.getProperty("environment") == null ? InitiateDriver.defaultEnv : System.getProperty("environment")).toUpperCase();
-            LOG.info("Launching URL" + getURL(page, route));
+            LOG.info("Launching URL in "+env+ " env " + getURL(page, route));
             if (env.equalsIgnoreCase("QA"))
                 driverThread.get().get(getValue("AuthUrl"));
             driverThread.get().get(getURL(page, route));
             clsThread.set(Class.forName("Polestar.Pages." + page));
-            globalPageName = page;
             Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
             objThread.set(ct.newInstance(driverThread.get()));
+            LOG.info("Scrolling to top of the web page");
+            ((JavascriptExecutor)driverThread.get()).executeScript("window.scrollTo(0,0)");
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | IOException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
@@ -458,7 +460,7 @@ public class StepDefinition extends Utils {
     @Then("verify the miles calculated")
     public void verifyTheMilesCalculated() {
         SoftAssert softAssert = new SoftAssert();
-        float rangeInMiles = motorType.equalsIgnoreCase("Single Motor") ? singleMotorRange : dualMotorRange;
+        float rangeInMiles = motorType.equalsIgnoreCase("Single Motor") ? Constants.SINGLE_MOTOR_RANGE : Constants.DUAL_MOTOR_RANGE;
         rangeData.forEach(s -> {
             float expectedValue;
             if (s.rangePercentage == 100) {
@@ -486,10 +488,9 @@ public class StepDefinition extends Utils {
         }
         rangeData.forEach(rangeData -> {
             String stateCode = getStateCode(stateName);
-            FuelPrices actualSavingsValue = null;
-            FuelPrices expectedSavingsValue;
+            FuelPrices actualSavingsValue = null,expectedSavingsValue = null;
             Long actualSaving = null;
-            double milesToKM = (rangeData.miles == 0 ? defaultMiles : rangeData.miles);
+            double milesToKM = (rangeData.miles == 0 ? Constants.DEFAULT_MILES : rangeData.miles);
             double km = milesToKM % 10 > 5 ? Math.ceil(milesToKM * 1.609) : Math.floor(milesToKM * 1.609);
             try {
                 if (globalPageName.equalsIgnoreCase("Polestar2")) {
@@ -694,7 +695,7 @@ public class StepDefinition extends Utils {
                 testReport.logImage(driverThread.get().getScreenshotAs(OutputType.BASE64));
                 LOG.info("Calling method getChargeDuration for class " + clsThread.get().getName());
                 chargeData = (ChargeData) callMethod(clsThread.get(), objThread.get(), "getChargeDuration" + " with params ");
-                double duration = ((batterySize * 0.01) * (chargeData.endChargePercentage - chargeData.startChargePercentage))
+                double duration = ((Constants.BATTERY_SIZE * 0.01) * (chargeData.endChargePercentage - chargeData.startChargePercentage))
                         / (Double.parseDouble(s.get("PowerOutput")) * 0.9);
                 int expectedHours = (int) Math.floor(duration);
                 int expectedMinutes = (int) Math.floor((duration - expectedHours) * 60);
@@ -733,13 +734,27 @@ public class StepDefinition extends Utils {
 
     @Given("User navigates to {string} page")
     public void userNavigatesToPage(String pageName) {
+        globalPageName=pageName;
+        LOG.info("Calling methods to go to Login page");
         user_navigates_to_header();
         clicks_on("Sign in");
         try {
-            clsThread.set(Class.forName("Polestar.Pages." + pageName));
+            clsThread.set(Class.forName("Polestar.Pages." + "PolestarProfile"));
             Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
             objThread.set(ct.newInstance(driverThread.get()));
-        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            if((boolean)callMethod(clsThread.get(),objThread.get(),"ifUserLoggedIn")){
+                LOG.info("Calling method clickOnTheLink for class " + clsThread.get().getName()+" with params "+"Log Out");
+                callMethod(clsThread.get(), objThread.get(), "clickOnTheLink", "Log Out");
+                new WebDriverWait(driverThread.get(),15,1).until(ExpectedConditions
+                .urlContains(getValue("BaseUrl")+globalRoute.toLowerCase()));
+                LOG.info("Calling methods to go to Login page from "+globalRoute+" homepage");
+                clsThread.set(Class.forName("Polestar.Pages." + "Polestar2"));
+                ct = clsThread.get().getConstructor(WebDriver.class);
+                objThread.set(ct.newInstance(driverThread.get()));
+                user_navigates_to_header();
+                clicks_on("Sign in");
+            }
+        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException | IOException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
         }
@@ -754,10 +769,11 @@ public class StepDefinition extends Utils {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
         }
-        pagesToVerify.forEach(s -> {
+        Constants.PAGES_TO_VERIFY.forEach(s -> {
             try {
                 driverThread.get().get(getURL(s, globalRoute));
                 clsThread.set(Class.forName("Polestar.Pages." + s));
+                LOG.info("Identifying if the user is shown as signed in "+s);
                 Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
                 objThread.set(ct.newInstance(driverThread.get()));
                 user_navigates_to_header();
@@ -776,8 +792,11 @@ public class StepDefinition extends Utils {
         LOG.info("Calling method enterValues for class " + clsThread.get().getName());
         try {
             LOG.info(key + "- " + getValue(key.replaceAll("\\s+", "")));
+            clsThread.set(Class.forName("Polestar.Pages." + globalPageName));
+            Constructor<?> ct = clsThread.get().getConstructor(WebDriver.class);
+            objThread.set(ct.newInstance(driverThread.get()));
             callMethod(clsThread.get(), objThread.get(), "enterValues", key, getValue(key.replaceAll("\\s+", "")));
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException | ClassNotFoundException | InstantiationException e) {
             LOG.error(getLog(e).toString());
             throw new RuntimeException(e);
         }
