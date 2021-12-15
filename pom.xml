@@ -23,7 +23,7 @@
         <selenium-plugin>3.141.59</selenium-plugin>
         <webdrivermanager>4.2.2</webdrivermanager>
         <apache.poi>5.0.0</apache.poi>
-        <logging.log4j>2.14.1</logging.log4j>
+        <logging.log4j>2.16.0</logging.log4j>
         <jackson-databind>2.10.5.1</jackson-databind>
         <rest-assured>4.3.3</rest-assured>
         <extentreports>5.0.6</extentreports>
