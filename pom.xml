@@ -22,7 +22,7 @@
         <reporting-plugin>4.0.94</reporting-plugin>
         <selenium-plugin>3.141.59</selenium-plugin>
         <webdrivermanager>4.2.2</webdrivermanager>
-        <apache.poi>5.0.0</apache.poi>
+        <apache.poi>5.4.0</apache.poi>
         <logging.log4j>2.17.1</logging.log4j>
         <jackson-databind>2.12.7.1</jackson-databind>
         <rest-assured>4.3.3</rest-assured>
