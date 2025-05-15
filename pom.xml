@@ -21,7 +21,7 @@
         <cucumber-testng-plugins>6.9.0</cucumber-testng-plugins>
         <reporting-plugin>4.0.94</reporting-plugin>
         <selenium-plugin>3.141.59</selenium-plugin>
-        <webdrivermanager>4.2.2</webdrivermanager>
+        <webdrivermanager>6.1.0</webdrivermanager>
         <apache.poi>5.0.0</apache.poi>
         <logging.log4j>2.17.1</logging.log4j>
         <jackson-databind>2.12.7.1</jackson-databind>
